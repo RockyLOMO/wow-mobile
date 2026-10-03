@@ -21,7 +21,9 @@ public final class WowNativeTouchController {
 
     private enum State { IDLE, PENDING, CAMERA_RIGHT_DRAG, LONG_PRESS_READY, LEFT_DRAG, SCROLL }
 
-    private static final int CLICK_HOLD_MS = 30;
+    // WoW can render below 30 FPS on a phone. Keep the button down across frames
+    // so a tap is not lost between two game input polls.
+    private static final int CLICK_HOLD_MS = 120;
     private static final int HAPTIC_MS = 25;
     private static final float SCROLL_STEP = 100f;
 

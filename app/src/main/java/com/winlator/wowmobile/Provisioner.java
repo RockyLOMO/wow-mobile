@@ -28,6 +28,7 @@ public class Provisioner {
     public static final int PROVISION_VERSION = 1;
     public static final String DEFAULT_REALMLIST = "logon.therawow.com";
     private static final String ADDONS_ASSET = "wowmobile/ConsolePortLK.zip";
+    private static final String TOUCH_UI_ADDON = "WoWMobileTouchUI";
 
     public enum Status {
         INVALID_FOLDER,      // Wow.exe not found
@@ -64,6 +65,9 @@ public class Provisioner {
     public Status getStatus() {
         if (!gameFolder.isValid()) return Status.INVALID_FOLDER;
         if (marker.optInt("provisionVersion", 0) < PROVISION_VERSION) return Status.PENDING;
+        File touchUi = new File(gameFolder.getAddOnsDir(), TOUCH_UI_ADDON);
+        if (!new File(touchUi, TOUCH_UI_ADDON+".toc").isFile() ||
+            !new File(touchUi, TOUCH_UI_ADDON+".lua").isFile()) return Status.PENDING;
 
         List<File> accounts = gameFolder.getAccountDirs();
         if (accounts.isEmpty()) return Status.WAITING_FIRST_LOGIN;
@@ -106,6 +110,8 @@ public class Provisioner {
                 saveMarker();
             }
 
+            if (!installTouchUiAddon()) return false;
+
             // Per-account steps: applied as soon as the account folder exists
             // (which happens after the first login). Run on every provision — both
             // steps are idempotent, and this self-heals a config half-written by
@@ -130,6 +136,20 @@ public class Provisioner {
         catch (JSONException e) {
             return false;
         }
+    }
+
+    /** Adds a small, independent action-bar scaling addon without replacing existing files. */
+    private boolean installTouchUiAddon() {
+        File dir = new File(gameFolder.getAddOnsDir(), TOUCH_UI_ADDON);
+        if (!dir.isDirectory() && !dir.mkdirs()) return false;
+        for (String extension : new String[]{"toc", "lua"}) {
+            String filename = TOUCH_UI_ADDON+"."+extension;
+            File target = new File(dir, filename);
+            if (target.isFile()) continue;
+            byte[] contents = FileUtils.read(context, "wowmobile/"+filename);
+            if (contents == null || !FileUtils.write(target, contents)) return false;
+        }
+        return true;
     }
 
     /** Extracts the bundled ConsolePortLK release into Interface/AddOns. */
