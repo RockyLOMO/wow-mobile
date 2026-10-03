@@ -27,6 +27,11 @@
     <string name="wow_settings_note">Change these only while the game is closed — WoW overwrites its config on exit.</string>
     <string name="wow_settings_saved">Settings saved</string>
     <string name="wow_save">Save</string>
+    <string name="wow_touch_mode">Touch control mode</string>
+    <string name="wow_touch_native">Native Touch</string>
+    <string name="wow_touch_legacy">ConsolePort / Legacy</string>
+    <string name="wow_long_press_delay">Long press delay</string>
+    <string name="wow_camera_sensitivity">Camera sensitivity</string>
     <string name="run">Run</string>
     <string name="edit">Edit</string>
     <string name="remove">Remove</string>

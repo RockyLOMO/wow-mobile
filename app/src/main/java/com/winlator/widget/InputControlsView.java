@@ -16,6 +16,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.util.SparseBooleanArray;
 import android.widget.FrameLayout;
 
 import com.winlator.inputcontrols.Binding;
@@ -60,6 +61,8 @@ public class InputControlsView extends View {
     private Timer mouseMoveTimer;
     private final PointF mouseMoveOffset = new PointF();
     private boolean showTouchscreenControls = true;
+    private final SparseBooleanArray nativeTouchPointers = new SparseBooleanArray();
+    private final SparseBooleanArray controlTouchPointers = new SparseBooleanArray();
 
     public InputControlsView(Context context) {
         super(context);
@@ -326,6 +329,8 @@ public class InputControlsView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!editMode && profile != null && touchpadView != null && touchpadView.isNativeTouchEnabled())
+            return onNativeTouchEvent(event);
         if (editMode && readyToDraw) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: {
@@ -416,6 +421,57 @@ public class InputControlsView extends View {
             }
         }
         return true;
+    }
+
+    private boolean onNativeTouchEvent(MotionEvent event) {
+        int action = event.getActionMasked();
+        if (action == MotionEvent.ACTION_CANCEL) {
+            cancelNativeTouch();
+            return true;
+        }
+        int index = event.getActionIndex();
+        int id = event.getPointerId(index);
+        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+            float x = event.getX(index), y = event.getY(index);
+            boolean control = false;
+            for (ControlElement element : profile.getElements())
+                if (element.handleTouchDown(id, x, y)) control = true;
+            if (control) controlTouchPointers.put(id, true);
+            else {
+                nativeTouchPointers.put(id, true);
+                touchpadView.nativeTouchDown(id, x, y);
+            }
+        }
+        else if (action == MotionEvent.ACTION_MOVE) {
+            for (int i = 0; i < event.getPointerCount(); i++) {
+                int moveId = event.getPointerId(i);
+                float x = event.getX(i), y = event.getY(i);
+                if (nativeTouchPointers.get(moveId)) touchpadView.nativeTouchMove(moveId, x, y);
+                else for (ControlElement element : profile.getElements()) element.handleTouchMove(moveId, x, y);
+            }
+        }
+        else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
+            float x = event.getX(index), y = event.getY(index);
+            if (nativeTouchPointers.get(id)) {
+                touchpadView.nativeTouchUp(id, x, y);
+                nativeTouchPointers.delete(id);
+            }
+            else {
+                for (ControlElement element : profile.getElements()) element.handleTouchUp(id, x, y);
+                controlTouchPointers.delete(id);
+            }
+        }
+        return true;
+    }
+
+    public void cancelNativeTouch() {
+        touchpadView.cancelNativeTouch();
+        nativeTouchPointers.clear();
+        if (profile != null) for (int i = 0; i < controlTouchPointers.size(); i++) {
+            int id = controlTouchPointers.keyAt(i);
+            for (ControlElement element : profile.getElements()) element.handleTouchUp(id, 0, 0);
+        }
+        controlTouchPointers.clear();
     }
 
     public boolean onKeyEvent(KeyEvent event) {

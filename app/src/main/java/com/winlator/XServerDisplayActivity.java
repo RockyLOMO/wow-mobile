@@ -70,6 +70,7 @@ import com.winlator.widget.FrameRating;
 import com.winlator.widget.InputControlsView;
 import com.winlator.widget.MagnifierView;
 import com.winlator.widget.TouchpadView;
+import com.winlator.wowmobile.WowContainerHelper;
 import com.winlator.widget.XServerView;
 import com.winlator.winhandler.GamepadHandler;
 import com.winlator.winhandler.TaskManagerDialog;
@@ -129,6 +130,7 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
     private SharedPreferences preferences;
     private final WinHandler winHandler = new WinHandler(this);
     private float globalCursorSpeed = 1.0f;
+    private Boolean relativeMouseBeforeNativeTouch;
     private boolean capturePointerOnExternalMouse = true;
     private MagnifierView magnifierView;
     private DebugDialog debugDialog;
@@ -318,6 +320,7 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
 
     @Override
     public void onPause() {
+        if (inputControlsView != null) inputControlsView.cancelNativeTouch();
         super.onPause();
         if (environment != null && !isInPictureInPictureMode()) {
             environment.onPause();
@@ -666,12 +669,27 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
     }
 
     private void showInputControls(ControlsProfile profile) {
+        if (inputControlsView != null) inputControlsView.cancelNativeTouch();
         inputControlsView.setVisibility(View.VISIBLE);
         inputControlsView.requestFocus();
         inputControlsView.setProfile(profile);
 
         touchpadView.setSensitivity(profile.getCursorSpeed() * globalCursorSpeed);
-        touchpadView.setPointerButtonRightEnabled(false);
+        boolean nativeTouch = WowContainerHelper.NATIVE_PROFILE_NAME.equals(profile.getName());
+        if (nativeTouch && relativeMouseBeforeNativeTouch == null) {
+            relativeMouseBeforeNativeTouch = xServer.isRelativeMouseMovement();
+        }
+        else if (!nativeTouch && relativeMouseBeforeNativeTouch != null) {
+            xServer.setRelativeMouseMovement(relativeMouseBeforeNativeTouch);
+            relativeMouseBeforeNativeTouch = null;
+        }
+        if (nativeTouch) xServer.setRelativeMouseMovement(true);
+        touchpadView.setNativeTouchEnabled(nativeTouch,
+            preferences.getInt(WowContainerHelper.PREF_LONG_PRESS_MS, 380),
+            preferences.getFloat(WowContainerHelper.PREF_CAMERA_SENSITIVITY, 1f));
+        touchpadView.setPointerButtonLeftEnabled(true);
+        touchpadView.setPointerButtonRightEnabled(nativeTouch);
+        touchpadView.setMoveCursorToTouchpoint(nativeTouch || preferences.getBoolean("move_cursor_to_touchpoint", false));
 
         GLRenderer renderer = xServerView.getRenderer();
         if (profile.isDisableMouseInput()) {
@@ -687,6 +705,13 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
     }
 
     private void hideInputControls() {
+        inputControlsView.cancelNativeTouch();
+        touchpadView.setNativeTouchEnabled(false, 380, 1f);
+        if (relativeMouseBeforeNativeTouch != null) {
+            xServer.setRelativeMouseMovement(relativeMouseBeforeNativeTouch);
+            relativeMouseBeforeNativeTouch = null;
+        }
+        touchpadView.setMoveCursorToTouchpoint(preferences.getBoolean("move_cursor_to_touchpoint", false));
         inputControlsView.setShowTouchscreenControls(true);
         inputControlsView.setVisibility(View.GONE);
         inputControlsView.setProfile(null);

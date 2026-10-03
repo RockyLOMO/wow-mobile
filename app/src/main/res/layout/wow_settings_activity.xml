@@ -89,6 +89,48 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/wow_touch_mode"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimaryText"/>
+
+            <Spinner
+                android:id="@+id/STouchMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/wow_long_press_delay"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimaryText"/>
+
+            <Spinner
+                android:id="@+id/SLongPress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/wow_camera_sensitivity"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimaryText"/>
+
+            <Spinner
+                android:id="@+id/SCameraSensitivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"/>
+
             <Button
                 android:id="@+id/BTSave"
                 android:layout_width="match_parent"

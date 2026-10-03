@@ -8,6 +8,8 @@ import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewConfiguration;
+import android.os.Vibrator;
 import android.widget.FrameLayout;
 
 import com.winlator.core.AppUtils;
@@ -18,6 +20,7 @@ import com.winlator.winhandler.MouseEventFlags;
 import com.winlator.winhandler.WinHandler;
 import com.winlator.xserver.Pointer;
 import com.winlator.xserver.XServer;
+import com.winlator.wow.WowNativeTouchController;
 
 public class TouchpadView extends View implements View.OnCapturedPointerListener {
     private static final byte MAX_FINGERS = 4;
@@ -40,6 +43,7 @@ public class TouchpadView extends View implements View.OnCapturedPointerListener
     private final XServer xServer;
     private Runnable fourFingersTapCallback;
     private final float[] xform = XForm.getInstance();
+    private WowNativeTouchController nativeTouch;
 
     public TouchpadView(Context context, XServer xServer, boolean capturePointerOnExternalMouse) {
         super(context);
@@ -189,6 +193,45 @@ public class TouchpadView extends View implements View.OnCapturedPointerListener
 
         return true;
     }
+
+    public boolean isNativeTouchEnabled() { return nativeTouch != null; }
+
+    public void setNativeTouchEnabled(boolean enabled, int longPressMs, float cameraSensitivity) {
+        if (nativeTouch != null) nativeTouch.cancel();
+        nativeTouch = null;
+        if (!enabled) return;
+        nativeTouch = new WowNativeTouchController(ViewConfiguration.get(getContext()),
+            (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE),
+            new WowNativeTouchController.MouseSink() {
+                @Override public void moveAbsolute(float x, float y) {
+                    float[] point = XForm.transformPoint(xform, x, y);
+                    xServer.injectPointerMove((int)point[0], (int)point[1]);
+                }
+                @Override public void moveRelative(float dx, float dy) {
+                    float[] delta = computeDeltaPoint(0, 0, dx, dy);
+                    int mx = Mathf.roundPoint(delta[0]), my = Mathf.roundPoint(delta[1]);
+                    if (xServer.isRelativeMouseMovement())
+                        xServer.getWinHandler().mouseEvent(MouseEventFlags.MOVE, mx, my, 0);
+                    else xServer.injectPointerMoveDelta(mx, my);
+                }
+                @Override public void pressLeft() { xServer.injectPointerButtonPress(Pointer.Button.BUTTON_LEFT); }
+                @Override public void releaseLeft() { xServer.injectPointerButtonRelease(Pointer.Button.BUTTON_LEFT); }
+                @Override public void pressRight() { xServer.injectPointerButtonPress(Pointer.Button.BUTTON_RIGHT); }
+                @Override public void releaseRight() { xServer.injectPointerButtonRelease(Pointer.Button.BUTTON_RIGHT); }
+                @Override public void scroll(boolean up) {
+                    Pointer.Button button = up ? Pointer.Button.BUTTON_SCROLL_UP : Pointer.Button.BUTTON_SCROLL_DOWN;
+                    xServer.injectPointerButtonPress(button);
+                    xServer.injectPointerButtonRelease(button);
+                }
+            });
+        nativeTouch.setLongPressMs(longPressMs);
+        nativeTouch.setSensitivity(cameraSensitivity);
+    }
+
+    public void nativeTouchDown(int id, float x, float y) { if (nativeTouch != null) nativeTouch.down(id, x, y); }
+    public void nativeTouchMove(int id, float x, float y) { if (nativeTouch != null) nativeTouch.move(id, x, y); }
+    public void nativeTouchUp(int id, float x, float y) { if (nativeTouch != null) nativeTouch.up(id, x, y); }
+    public void cancelNativeTouch() { if (nativeTouch != null) nativeTouch.cancel(); }
 
     private void handleFingerUp(Finger finger1) {
         switch (numFingers) {

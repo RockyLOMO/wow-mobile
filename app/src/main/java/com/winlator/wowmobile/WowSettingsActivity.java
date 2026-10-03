@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
@@ -22,7 +23,7 @@ import java.util.LinkedHashSet;
  * Edits WoW's own configuration (Config.wtf + realmlist.wtf) while the game is off.
  */
 public class WowSettingsActivity extends AppCompatActivity {
-    private static final String[] RESOLUTIONS = {"800x360", "960x432", "1200x540", "1600x720"};
+    private static final String[] RESOLUTIONS = {"800x360", "960x432", "1140x540", "1200x540", "1520x720", "1600x720"};
     private static final String[] FARCLIP_LABELS = {"Near (fastest)", "Medium", "Far (slower)"};
     private static final String[] FARCLIP_VALUES = {"400", "727", "1000"};
 
@@ -32,6 +33,9 @@ public class WowSettingsActivity extends AppCompatActivity {
     private EditText etCustomRealmlist;
     private Spinner sResolution;
     private Spinner sFarclip;
+    private Spinner sTouchMode;
+    private Spinner sLongPress;
+    private Spinner sCameraSensitivity;
     private ArrayList<String> realmlistItems;
 
     @Override
@@ -54,6 +58,21 @@ public class WowSettingsActivity extends AppCompatActivity {
         etCustomRealmlist = findViewById(R.id.ETCustomRealmlist);
         sResolution = findViewById(R.id.SResolution);
         sFarclip = findViewById(R.id.SFarclip);
+        sTouchMode = findViewById(R.id.STouchMode);
+        sLongPress = findViewById(R.id.SLongPress);
+        sCameraSensitivity = findViewById(R.id.SCameraSensitivity);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        sTouchMode.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+            new String[]{getString(R.string.wow_touch_native), getString(R.string.wow_touch_legacy)}));
+        sTouchMode.setSelection(prefs.getBoolean(WowContainerHelper.PREF_NATIVE_TOUCH, true) ? 0 : 1);
+        sLongPress.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+            new String[]{"300 ms", "380 ms", "450 ms", "550 ms"}));
+        int delay = prefs.getInt(WowContainerHelper.PREF_LONG_PRESS_MS, 380);
+        sLongPress.setSelection(delay == 300 ? 0 : delay == 450 ? 2 : delay == 550 ? 3 : 1);
+        sCameraSensitivity.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+            new String[]{"0.7x", "1.0x", "1.3x", "1.6x"}));
+        float sensitivity = prefs.getFloat(WowContainerHelper.PREF_CAMERA_SENSITIVITY, 1f);
+        sCameraSensitivity.setSelection(sensitivity == 0.7f ? 0 : sensitivity == 1.3f ? 2 : sensitivity == 1.6f ? 3 : 1);
 
         TextView tvLocale = findViewById(R.id.TVLocale);
         String locale = gameFolder.getLocale();
@@ -132,6 +151,13 @@ public class WowSettingsActivity extends AppCompatActivity {
         provisioner.ensureRealmlist(host);
         provisioner.setConfigValue("gxResolution", RESOLUTIONS[sResolution.getSelectedItemPosition()]);
         provisioner.setConfigValue("farclip", FARCLIP_VALUES[sFarclip.getSelectedItemPosition()]);
+        int[] delays = {300, 380, 450, 550};
+        float[] sensitivities = {0.7f, 1f, 1.3f, 1.6f};
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
+            .putBoolean(WowContainerHelper.PREF_NATIVE_TOUCH, sTouchMode.getSelectedItemPosition() == 0)
+            .putInt(WowContainerHelper.PREF_LONG_PRESS_MS, delays[sLongPress.getSelectedItemPosition()])
+            .putFloat(WowContainerHelper.PREF_CAMERA_SENSITIVITY, sensitivities[sCameraSensitivity.getSelectedItemPosition()])
+            .apply();
 
         AppUtils.showToast(this, R.string.wow_settings_saved);
         finish();

@@ -3,6 +3,8 @@ package com.winlator.wowmobile;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.preference.PreferenceManager;
+
 import com.winlator.XServerDisplayActivity;
 import com.winlator.container.Container;
 import com.winlator.container.ContainerManager;
@@ -28,6 +30,10 @@ public class WowContainerHelper {
     public static final String CONTAINER_NAME = "WoW";
     public static final String SHORTCUT_NAME = "World of Warcraft";
     public static final String CONTROLS_PROFILE_NAME = "WoW ConsolePortLK";
+    public static final String NATIVE_PROFILE_NAME = "WoW Native Touch";
+    public static final String PREF_NATIVE_TOUCH = "wow_native_touch";
+    public static final String PREF_LONG_PRESS_MS = "wow_long_press_ms";
+    public static final String PREF_CAMERA_SENSITIVITY = "wow_camera_sensitivity";
     public static final String GAME_DRIVE_LETTER = "F";
     public static final String DEFAULT_SCREEN_SIZE = "960x432";
 
@@ -121,8 +127,18 @@ public class WowContainerHelper {
 
     private int getControlsProfileId() {
         InputControlsManager inputControlsManager = new InputControlsManager(context);
+        boolean nativeTouch = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_NATIVE_TOUCH, true);
+        String profileName = nativeTouch ? NATIVE_PROFILE_NAME : CONTROLS_PROFILE_NAME;
         for (ControlsProfile profile : inputControlsManager.getProfiles()) {
-            if (CONTROLS_PROFILE_NAME.equals(profile.getName())) return profile.id;
+            if (profileName.equals(profile.getName())) return profile.id;
+        }
+        if (nativeTouch) {
+            try {
+                JSONObject data = new JSONObject(FileUtils.readString(context, "inputcontrols/profiles/controls-6.icp"));
+                ControlsProfile profile = inputControlsManager.importProfile(data);
+                if (profile != null) return profile.id;
+            }
+            catch (JSONException ignored) {}
         }
         return 0;
     }
