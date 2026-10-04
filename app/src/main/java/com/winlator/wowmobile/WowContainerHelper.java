@@ -35,7 +35,7 @@ public class WowContainerHelper {
     public static final String PREF_LONG_PRESS_MS = "wow_long_press_ms";
     public static final String PREF_CAMERA_SENSITIVITY = "wow_camera_sensitivity";
     public static final String GAME_DRIVE_LETTER = "F";
-    public static final String DEFAULT_SCREEN_SIZE = "960x432";
+    public static final String DEFAULT_SCREEN_SIZE = WowResolution.DEFAULT;
 
     private final Context context;
     private final ContainerManager manager;
@@ -55,7 +55,9 @@ public class WowContainerHelper {
     /** Creates the WoW container with tuned defaults if it does not exist yet. */
     public void ensureContainerAsync(GameFolder gameFolder, Callback<Container> callback) {
         Container existing = getContainer();
+        String screenSize = WowResolution.normalize(new Provisioner(context, gameFolder).getConfigValue("gxResolution"));
         if (existing != null) {
+            syncScreenSize(existing, screenSize);
             ensureGameDrive(existing, gameFolder);
             callback.call(existing);
             return;
@@ -64,7 +66,7 @@ public class WowContainerHelper {
         try {
             JSONObject data = new JSONObject();
             data.put("name", CONTAINER_NAME);
-            data.put("screenSize", DEFAULT_SCREEN_SIZE);
+            data.put("screenSize", screenSize);
             data.put("envVars", Container.DEFAULT_ENV_VARS);
             data.put("graphicsDriver", GraphicsDrivers.getDefaultDriver(context));
             data.put("dxwrapper", Container.DEFAULT_DXWRAPPER);
@@ -76,6 +78,15 @@ public class WowContainerHelper {
         }
         catch (JSONException e) {
             callback.call(null);
+        }
+    }
+
+    /** Keeps the Wine desktop and WoW render resolution identical. */
+    public void syncScreenSize(Container container, String screenSize) {
+        screenSize = WowResolution.normalize(screenSize);
+        if (container != null && !screenSize.equals(container.getScreenSize())) {
+            container.setScreenSize(screenSize);
+            container.saveData();
         }
     }
 
@@ -120,6 +131,8 @@ public class WowContainerHelper {
 
         int profileId = getControlsProfileId();
         if (profileId > 0) content += "controlsProfile="+profileId+"\n";
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_NATIVE_TOUCH, true))
+            content += "stretchFullscreen=1\n";
 
         FileUtils.writeString(shortcutFile, content);
         return shortcutFile;

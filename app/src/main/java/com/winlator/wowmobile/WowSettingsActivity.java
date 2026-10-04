@@ -23,7 +23,7 @@ import java.util.LinkedHashSet;
  * Edits WoW's own configuration (Config.wtf + realmlist.wtf) while the game is off.
  */
 public class WowSettingsActivity extends AppCompatActivity {
-    private static final String[] RESOLUTIONS = {"800x360", "960x432", "1140x540", "1200x540", "1520x720", "1600x720"};
+    private static final String[] RESOLUTIONS = {"1280x720", "1280x1024", "1520x720", "1600x720", "1920x1080"};
     private static final String[] FARCLIP_LABELS = {"Near (fastest)", "Medium", "Far (slower)"};
     private static final String[] FARCLIP_VALUES = {"400", "727", "1000"};
 
@@ -124,11 +124,11 @@ public class WowSettingsActivity extends AppCompatActivity {
     }
 
     private void loadGraphics() {
-        sResolution.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, RESOLUTIONS));
-        String resolution = provisioner.getConfigValue("gxResolution");
-        int index = 1;
-        for (int i = 0; i < RESOLUTIONS.length; i++) if (RESOLUTIONS[i].equals(resolution)) index = i;
-        sResolution.setSelection(index);
+        String resolution = WowResolution.normalize(provisioner.getConfigValue("gxResolution"));
+        ArrayList<String> resolutions = new ArrayList<>(java.util.Arrays.asList(RESOLUTIONS));
+        if (!resolutions.contains(resolution)) resolutions.add(resolution);
+        sResolution.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, resolutions));
+        sResolution.setSelection(resolutions.indexOf(resolution));
 
         sFarclip.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, FARCLIP_LABELS));
         String farclip = provisioner.getConfigValue("farclip");
@@ -149,7 +149,10 @@ public class WowSettingsActivity extends AppCompatActivity {
         else host = realmlistItems.get(sRealmlist.getSelectedItemPosition());
 
         provisioner.ensureRealmlist(host);
-        provisioner.setConfigValue("gxResolution", RESOLUTIONS[sResolution.getSelectedItemPosition()]);
+        String resolution = (String)sResolution.getSelectedItem();
+        provisioner.setConfigValue("gxResolution", resolution);
+        WowContainerHelper helper = new WowContainerHelper(this);
+        helper.syncScreenSize(helper.getContainer(), resolution);
         provisioner.setConfigValue("farclip", FARCLIP_VALUES[sFarclip.getSelectedItemPosition()]);
         int[] delays = {300, 380, 450, 550};
         float[] sensitivities = {0.7f, 1f, 1.3f, 1.6f};

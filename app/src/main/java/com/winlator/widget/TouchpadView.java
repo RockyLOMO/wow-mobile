@@ -203,13 +203,14 @@ public class TouchpadView extends View implements View.OnCapturedPointerListener
         nativeTouch = new WowNativeTouchController(ViewConfiguration.get(getContext()),
             (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE),
             new WowNativeTouchController.MouseSink() {
+                private final float[] mappedPoint = new float[2];
                 @Override public void moveAbsolute(float x, float y) {
-                    float[] point = XForm.transformPoint(xform, x, y);
-                    xServer.injectPointerMove((int)point[0], (int)point[1]);
+                    xServer.getRenderer().touchCoordinateMapper.mapPoint(x, y, mappedPoint);
+                    xServer.injectPointerMove(Mathf.roundPoint(mappedPoint[0]), Mathf.roundPoint(mappedPoint[1]));
                 }
                 @Override public void moveRelative(float dx, float dy) {
-                    float[] delta = computeDeltaPoint(0, 0, dx, dy);
-                    int mx = Mathf.roundPoint(delta[0]), my = Mathf.roundPoint(delta[1]);
+                    xServer.getRenderer().touchCoordinateMapper.mapDelta(dx, dy, mappedPoint);
+                    int mx = Mathf.roundPoint(mappedPoint[0]), my = Mathf.roundPoint(mappedPoint[1]);
                     if (xServer.isRelativeMouseMovement())
                         xServer.getWinHandler().mouseEvent(MouseEventFlags.MOVE, mx, my, 0);
                     else xServer.injectPointerMoveDelta(mx, my);

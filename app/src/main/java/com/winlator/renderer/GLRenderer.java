@@ -47,6 +47,7 @@ public class GLRenderer implements GLSurfaceView.Renderer, WindowManager.OnWindo
     private final CursorMaterial cursorMaterial = new CursorMaterial();
     private final WindowMaterial windowMaterial = new WindowMaterial();
     public final ViewTransformation viewTransformation = new ViewTransformation();
+    public final TouchCoordinateMapper touchCoordinateMapper = new TouchCoordinateMapper();
     private final Drawable rootCursorDrawable;
     private final ArrayList<RenderableWindow> renderableWindows = new ArrayList<>();
     private boolean forceWindowsFullscreen;
@@ -142,6 +143,12 @@ public class GLRenderer implements GLSurfaceView.Renderer, WindowManager.OnWindo
         }
 
         XForm.makeTransform(tmpXForm2, -pointerX, -pointerY, magnifierZoom, magnifierZoom, 0);
+        touchCoordinateMapper.update(surfaceHeight,
+            fullscreen ? 0 : viewTransformation.viewOffsetX,
+            fullscreen ? 0 : viewTransformation.viewOffsetY,
+            fullscreen ? surfaceWidth : viewTransformation.viewWidth,
+            fullscreen ? surfaceHeight : viewTransformation.viewHeight,
+            xServer.screenInfo.width, xServer.screenInfo.height, magnifierZoom, pointerX, pointerY);
 
         renderWindows();
         if (cursorVisible) renderCursor();

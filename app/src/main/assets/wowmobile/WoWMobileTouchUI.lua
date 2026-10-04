@@ -1,11 +1,15 @@
--- WoW Mobile Touch UI v2
+-- WoW Mobile Touch UI v3
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-frame:SetScript("OnEvent", function()
-    -- Enlarge Blizzard UI text without enlarging the already touch-sized action bar.
-    UIParent:SetScale(1.12)
-    if MainMenuBar then
-        MainMenuBar:SetScale(1.35 / 1.12)
+frame:RegisterEvent("DISPLAY_SIZE_CHANGED")
+frame:RegisterEvent("UI_SCALE_CHANGED")
+frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+local function updateLayout()
+    -- Leave UIParent under the game's control so panels and bag anchors agree.
+    -- Fit the entire bottom bar, including its backpack buttons, inside the screen.
+    if MainMenuBar and not InCombatLockdown() then
+        local available = UIParent:GetWidth() - 48
+        MainMenuBar:SetScale(math.min(1.35, available / MainMenuBar:GetWidth()))
     end
     if FCF_SetChatWindowFontSize then
         for i = 1, 2 do
@@ -18,4 +22,5 @@ frame:SetScript("OnEvent", function()
             end
         end
     end
-end)
+end
+frame:SetScript("OnEvent", updateLayout)

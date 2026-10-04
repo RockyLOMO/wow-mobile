@@ -70,7 +70,7 @@ public class Provisioner {
         File touchUi = new File(gameFolder.getAddOnsDir(), TOUCH_UI_ADDON);
         if (!new File(touchUi, TOUCH_UI_ADDON+".toc").isFile() ||
             !new File(touchUi, TOUCH_UI_ADDON+".lua").isFile()) return Status.PENDING;
-        if (isUnmodifiedTouchUiV1(new File(touchUi, TOUCH_UI_ADDON+".lua"))) return Status.PENDING;
+        if (isUnmodifiedLegacyTouchUi(new File(touchUi, TOUCH_UI_ADDON+".lua"))) return Status.PENDING;
 
         List<File> accounts = gameFolder.getAccountDirs();
         if (accounts.isEmpty()) return Status.WAITING_FIRST_LOGIN;
@@ -114,6 +114,9 @@ public class Provisioner {
             }
 
             if (!installTouchUiAddon()) return false;
+            String resolution = getConfigValue("gxResolution");
+            String normalized = WowResolution.normalize(resolution);
+            if (!normalized.equals(resolution) && !setConfigValue("gxResolution", normalized)) return false;
 
             // Per-account steps: applied as soon as the account folder exists
             // (which happens after the first login). Run on every provision — both
@@ -141,7 +144,7 @@ public class Provisioner {
         }
     }
 
-    /** Installs the touch UI addon and upgrades only the unmodified v1 Lua file. */
+    /** Upgrades known bundled versions while preserving user-customized Lua. */
     private boolean installTouchUiAddon() {
         File dir = new File(gameFolder.getAddOnsDir(), TOUCH_UI_ADDON);
         if (!dir.isDirectory() && !dir.mkdirs()) return false;
@@ -151,14 +154,14 @@ public class Provisioner {
             byte[] contents = FileUtils.read(context, "wowmobile/"+filename);
             if (contents == null) return false;
             if (target.isFile()) {
-                if (!"lua".equals(extension) || !isUnmodifiedTouchUiV1(target)) continue;
+                if (!"lua".equals(extension) || !isUnmodifiedLegacyTouchUi(target)) continue;
             }
             if (!FileUtils.write(target, contents)) return false;
         }
         return true;
     }
 
-    private boolean isUnmodifiedTouchUiV1(File file) {
+    private boolean isUnmodifiedLegacyTouchUi(File file) {
         String legacy = "local frame = CreateFrame(\"Frame\")\n"+
             "frame:RegisterEvent(\"PLAYER_ENTERING_WORLD\")\n"+
             "frame:SetScript(\"OnEvent\", function()\n"+
@@ -166,7 +169,9 @@ public class Provisioner {
             "        MainMenuBar:SetScale(1.35)\n"+
             "    end\n"+
             "end)";
-        return legacy.equals(FileUtils.readString(file).replace("\r\n", "\n").trim());
+        String current = FileUtils.readString(file).replace("\r\n", "\n").trim();
+        String v2 = FileUtils.readString(context, "wowmobile/legacy/WoWMobileTouchUI-v2.lua");
+        return legacy.equals(current) || v2.replace("\r\n", "\n").trim().equals(current);
     }
 
     /** Extracts the bundled ConsolePortLK release into Interface/AddOns. */
@@ -281,7 +286,7 @@ public class Provisioner {
             {"hwDetect", "0"},
             {"gxWindow", "1"},
             {"gxMaximize", "1"},
-            {"gxResolution", "960x432"},
+            {"gxResolution", WowResolution.normalize(getConfigValue("gxResolution"))},
             {"autoLootDefault", "1"},
             {"gxRefresh", "60"},
             {"gxMultisampleQuality", "0.000000"},
