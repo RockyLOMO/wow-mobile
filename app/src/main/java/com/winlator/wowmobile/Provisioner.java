@@ -2,6 +2,8 @@ package com.winlator.wowmobile;
 
 import android.content.Context;
 
+import androidx.preference.PreferenceManager;
+
 import com.winlator.core.FileUtils;
 
 import org.json.JSONException;
@@ -355,17 +357,20 @@ public class Provisioner {
 
     /**
      * Rewrites bindings-cache.wtf: removes stale "bind KEY NONE" suppressions and
-     * conflicting binds for our keys, then appends the ConsolePort map.
+     * conflicting binds for our keys, then appends movement and ConsolePort maps.
      */
     private void patchBindingsCache(File accountDir) {
         File file = new File(accountDir, "bindings-cache.wtf");
+        boolean nativeTouch = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(WowContainerHelper.PREF_NATIVE_TOUCH, true);
 
         List<String> kept = new ArrayList<>();
         if (file.isFile()) {
             for (String line : FileUtils.readString(file).split("\n")) {
                 String trimmed = line.trim().replace("\r", "");
                 if (trimmed.isEmpty()) continue;
-                boolean conflicting = false;
+                boolean conflicting = trimmed.startsWith("bind A ") || trimmed.startsWith("bind D ") ||
+                    trimmed.startsWith("bind \"A\" ") || trimmed.startsWith("bind \"D\" ");
                 for (String[] binding : KEY_BINDINGS) {
                     if (trimmed.startsWith("bind "+binding[0]+" ")) {
                         conflicting = true;
@@ -378,6 +383,9 @@ public class Provisioner {
 
         StringBuilder sb = new StringBuilder();
         for (String line : kept) sb.append(line).append("\n");
+        // Native Touch uses the right-hand drag gesture for turning the camera.
+        sb.append("bind A ").append(nativeTouch ? "STRAFELEFT" : "TURNLEFT").append("\n");
+        sb.append("bind D ").append(nativeTouch ? "STRAFERIGHT" : "TURNRIGHT").append("\n");
         for (String[] binding : KEY_BINDINGS) sb.append("bind ").append(binding[0]).append(" ").append(binding[1]).append("\n");
         FileUtils.writeString(file, sb.toString());
     }
