@@ -68,6 +68,7 @@ public class Provisioner {
         File touchUi = new File(gameFolder.getAddOnsDir(), TOUCH_UI_ADDON);
         if (!new File(touchUi, TOUCH_UI_ADDON+".toc").isFile() ||
             !new File(touchUi, TOUCH_UI_ADDON+".lua").isFile()) return Status.PENDING;
+        if (isUnmodifiedTouchUiV1(new File(touchUi, TOUCH_UI_ADDON+".lua"))) return Status.PENDING;
 
         List<File> accounts = gameFolder.getAccountDirs();
         if (accounts.isEmpty()) return Status.WAITING_FIRST_LOGIN;
@@ -138,18 +139,32 @@ public class Provisioner {
         }
     }
 
-    /** Adds a small, independent action-bar scaling addon without replacing existing files. */
+    /** Installs the touch UI addon and upgrades only the unmodified v1 Lua file. */
     private boolean installTouchUiAddon() {
         File dir = new File(gameFolder.getAddOnsDir(), TOUCH_UI_ADDON);
         if (!dir.isDirectory() && !dir.mkdirs()) return false;
         for (String extension : new String[]{"toc", "lua"}) {
             String filename = TOUCH_UI_ADDON+"."+extension;
             File target = new File(dir, filename);
-            if (target.isFile()) continue;
             byte[] contents = FileUtils.read(context, "wowmobile/"+filename);
-            if (contents == null || !FileUtils.write(target, contents)) return false;
+            if (contents == null) return false;
+            if (target.isFile()) {
+                if (!"lua".equals(extension) || !isUnmodifiedTouchUiV1(target)) continue;
+            }
+            if (!FileUtils.write(target, contents)) return false;
         }
         return true;
+    }
+
+    private boolean isUnmodifiedTouchUiV1(File file) {
+        String legacy = "local frame = CreateFrame(\"Frame\")\n"+
+            "frame:RegisterEvent(\"PLAYER_ENTERING_WORLD\")\n"+
+            "frame:SetScript(\"OnEvent\", function()\n"+
+            "    if MainMenuBar then\n"+
+            "        MainMenuBar:SetScale(1.35)\n"+
+            "    end\n"+
+            "end)";
+        return legacy.equals(FileUtils.readString(file).replace("\r\n", "\n").trim());
     }
 
     /** Extracts the bundled ConsolePortLK release into Interface/AddOns. */
@@ -265,6 +280,7 @@ public class Provisioner {
             {"gxWindow", "1"},
             {"gxMaximize", "1"},
             {"gxResolution", "960x432"},
+            {"autoLootDefault", "1"},
             {"gxRefresh", "60"},
             {"gxMultisampleQuality", "0.000000"},
             {"gxFixLag", "0"},
