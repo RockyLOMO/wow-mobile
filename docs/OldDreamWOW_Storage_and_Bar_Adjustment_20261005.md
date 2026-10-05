@@ -47,6 +47,10 @@
 
 ![一键打开系统授权](OldDreamWOW_S10_background_permission_v9.png)
 
+![授权后的启动页状态](OldDreamWOW_S10_background_allowed_v9.png)
+
+收尾：已关闭旧梦WOW、Wow.exe和Wine进程，无安装服务残留；媒体音量0、充电常亮关闭、屏幕Dozing。原`WoW335CN/Wow.exe`保留，工作资料用户10未安装应用。
+
 ## APK发布
 
 - 固定文件名：`E:\rxdev\webhost\wow\OldDreamWOW.apk`，本机副本`docs/OldDreamWOW.apk`。
