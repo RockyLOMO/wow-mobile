@@ -55,7 +55,7 @@ public class WowContainerHelper {
     /** Creates the WoW container with tuned defaults if it does not exist yet. */
     public void ensureContainerAsync(GameFolder gameFolder, Callback<Container> callback) {
         Container existing = getContainer();
-        String screenSize = WowResolution.normalize(new Provisioner(context, gameFolder).getConfigValue("gxResolution"));
+        String screenSize = OldDreamIntegration.resolution(context);
         if (existing != null) {
             syncScreenSize(existing, screenSize);
             ensureGameDrive(existing, gameFolder);
@@ -133,6 +133,7 @@ public class WowContainerHelper {
         if (profileId > 0) content += "controlsProfile="+profileId+"\n";
         // Keep the same aspect ratio on every device rather than stretching the game.
         content += "preserveAspectRatio=1\n";
+        content += "oldDream=1\n";
 
         FileUtils.writeString(shortcutFile, content);
         return shortcutFile;
@@ -143,7 +144,10 @@ public class WowContainerHelper {
         boolean nativeTouch = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_NATIVE_TOUCH, true);
         String profileName = nativeTouch ? NATIVE_PROFILE_NAME : CONTROLS_PROFILE_NAME;
         for (ControlsProfile profile : inputControlsManager.getProfiles()) {
-            if (profileName.equals(profile.getName())) return profile.id;
+            if (profileName.equals(profile.getName())) {
+                if (nativeTouch) localizeNativeLabels(profile.id);
+                return profile.id;
+            }
         }
         if (nativeTouch) {
             try {
@@ -154,6 +158,24 @@ public class WowContainerHelper {
             catch (JSONException ignored) {}
         }
         return 0;
+    }
+
+    /** Migrate only the original labels; keep the player's positions and custom labels. */
+    private void localizeNativeLabels(int id) {
+        File file = ControlsProfile.getProfileFile(context, id);
+        try {
+            JSONObject data = new JSONObject(FileUtils.readString(file));
+            org.json.JSONArray elements = data.getJSONArray("elements");
+            boolean changed = false;
+            for (int i = 0; i < elements.length(); i++) {
+                JSONObject element = elements.getJSONObject(i);
+                String binding = element.getJSONArray("bindings").optString(0);
+                String label = element.optString("text");
+                if ("KEY_SPACE".equals(binding) && "JUMP".equals(label)) { element.put("text", "跳跃"); changed = true; }
+                if ("KEY_TAB".equals(binding) && "TGT".equals(label)) { element.put("text", "目标"); changed = true; }
+            }
+            if (changed) FileUtils.writeString(file, data.toString());
+        } catch (JSONException ignored) {}
     }
 
     public Intent createLaunchIntent(Container container, File shortcutFile) {

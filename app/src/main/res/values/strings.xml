@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">旧梦</string>
+    <string name="app_name">旧梦WOW</string>
     <string name="wow_subtitle">巫妖王之怒 · 3.3.5a</string>
     <string name="wow_play">PLAY</string>
     <string name="wow_settings">旧梦设置</string>
@@ -21,7 +21,7 @@
     <string name="wow_realm_server">Realm server</string>
     <string name="wow_custom_realmlist">Custom…</string>
     <string name="wow_custom_realmlist_hint">logon.example.com</string>
-    <string name="wow_resolution">固定分辨率（720p）</string>
+    <string name="wow_resolution">自动分辨率（固定高720）</string>
     <string name="wow_preserve_aspect_ratio">旧梦使用等比显示，避免画面变形</string>
     <string name="wow_view_distance">View distance</string>
     <string name="wow_detected_locale">Detected client locale</string>

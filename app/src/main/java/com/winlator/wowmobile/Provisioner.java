@@ -115,7 +115,7 @@ public class Provisioner {
 
             if (!installTouchUiAddon()) return false;
             String resolution = getConfigValue("gxResolution");
-            String normalized = WowResolution.normalize(resolution);
+            String normalized = OldDreamIntegration.resolution(context);
             if (!normalized.equals(resolution) && !setConfigValue("gxResolution", normalized)) return false;
 
             // Per-account steps: applied as soon as the account folder exists
@@ -290,7 +290,7 @@ public class Provisioner {
             {"hwDetect", "0"},
             {"gxWindow", "1"},
             {"gxMaximize", "1"},
-            {"gxResolution", WowResolution.normalize(getConfigValue("gxResolution"))},
+            {"gxResolution", OldDreamIntegration.resolution(context)},
             {"autoLootDefault", "1"},
             {"gxRefresh", "60"},
             {"gxMultisampleQuality", "0.000000"},

@@ -123,7 +123,7 @@ public class WowSettingsActivity extends AppCompatActivity {
     }
 
     private void loadGraphics() {
-        String resolution = WowResolution.normalize(provisioner.getConfigValue("gxResolution"));
+        String resolution = OldDreamIntegration.resolution(this);
         sResolution.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
             new String[]{resolution}));
         sResolution.setEnabled(false);

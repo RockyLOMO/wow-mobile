@@ -45,6 +45,10 @@ public abstract class RootFSInstaller {
     }
 
     public static void install(final AppCompatActivity activity) {
+        install(activity, null);
+    }
+
+    public static void install(final AppCompatActivity activity, com.winlator.core.Callback<Boolean> completion) {
         AppUtils.keepScreenOn(activity);
         RootFS rootFS = RootFS.find(activity);
         final File rootDir = rootFS.getRootDir();
@@ -74,6 +78,7 @@ public abstract class RootFSInstaller {
             else AppUtils.showToast(activity, R.string.unable_to_install_system_files);
 
             dialog.closeOnUiThread();
+            if (completion != null) activity.runOnUiThread(() -> completion.call(success));
         });
     }
 

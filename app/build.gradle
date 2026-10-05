@@ -9,6 +9,7 @@ android {
         targetSdkVersion 28
         versionCode 3
         versionName "0.1.2"
+        testInstrumentationRunner "com.winlator.wowmobile.BootstrapSmokeInstrumentation"
     }
 
     // Release signing: reads WOW_KEYSTORE_PROPS env var or ~/.wow-mobile-secrets/keystore.properties.

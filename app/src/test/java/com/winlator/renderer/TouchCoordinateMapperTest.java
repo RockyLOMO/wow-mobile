@@ -57,6 +57,18 @@ public final class TouchCoordinateMapperTest {
             if (!WowResolution.DEFAULT.equals(WowResolution.normalize(previous)))
                 throw new AssertionError("Fixed 720p migration failed");
         }
+        int[][] displays = {{1520,720,1520}, {3040,1440,1520}, {720,1520,1520}, {1920,1080,1280}, {2400,1080,1600}, {1920,1200,1152}, {1024,768,960}};
+        for (int[] display : displays) {
+            String result = WowResolution.forDisplay(display[0], display[1]);
+            if (!result.equals(display[2]+"x720") || !result.equals(WowResolution.normalize(result)))
+                throw new AssertionError("Automatic display ratio: " + result);
+            int width=display[2], landscapeW=Math.max(display[0],display[1]), landscapeH=Math.min(display[0],display[1]);
+            fit.update(landscapeW,landscapeH,width,720);
+            mapper.update(landscapeH,fit.viewOffsetX,fit.viewOffsetY,fit.viewWidth,fit.viewHeight,width,720,1,0,0);
+            top=landscapeH-fit.viewOffsetY-fit.viewHeight;
+            mapper.mapPoint(fit.viewOffsetX+fit.viewWidth*.9f,top+fit.viewHeight*.9f,point);
+            check(width*.9f,point[0]); check(648,point[1]);
+        }
         System.out.println("PASS: touch transforms, five display aspect ratios and fixed 720p migration");
     }
 

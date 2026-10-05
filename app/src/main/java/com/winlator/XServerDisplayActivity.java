@@ -332,6 +332,7 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
     protected void onDestroy() {
         winHandler.stop();
         if (environment != null) environment.stopEnvironmentComponents();
+
         super.onDestroy();
     }
 
@@ -423,6 +424,8 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
     private void exit() {
         winHandler.stop();
         if (environment != null) environment.stopEnvironmentComponents();
+
+        if (com.winlator.wowmobile.OldDreamIntegration.returnToLauncher(this, shortcut)) return;
 
         Intent intent = getIntent();
         if (intent.hasExtra("exec_path")) {
