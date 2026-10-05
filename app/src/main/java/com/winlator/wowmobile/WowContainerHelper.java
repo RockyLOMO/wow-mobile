@@ -160,7 +160,7 @@ public class WowContainerHelper {
         return 0;
     }
 
-    /** Migrate only the original labels; keep the player's positions and custom labels. */
+    /** Migrate bundled positions and labels, preserving custom positions and names. */
     private void localizeNativeLabels(int id) {
         File file = ControlsProfile.getProfileFile(context, id);
         try {
@@ -171,6 +171,22 @@ public class WowContainerHelper {
                 JSONObject element = elements.getJSONObject(i);
                 String binding = element.getJSONArray("bindings").optString(0);
                 String label = element.optString("text");
+                double x = element.optDouble("x");
+                if ("D_PAD".equals(element.optString("type")) && Math.abs(x - 0.09) < 0.0001) {
+                    android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
+                    ((android.view.WindowManager)context.getSystemService(Context.WINDOW_SERVICE))
+                        .getDefaultDisplay().getRealMetrics(metrics);
+                    int width = Math.max(metrics.widthPixels, metrics.heightPixels);
+                    int snap = width / 100;
+                    int maxWidth = (width / snap) * snap;
+                    int center = (int)Math.ceil((int)(snap * 7 * element.optDouble("scale", 1.4)) + snap * 0.125);
+                    element.put("x", center / (double)maxWidth);
+                    changed = true;
+                }
+                if (("KEY_SPACE".equals(binding) || "KEY_TAB".equals(binding)) && Math.abs(x - 0.94) < 0.0001) {
+                    element.put("x", 0.81);
+                    changed = true;
+                }
                 if ("KEY_SPACE".equals(binding) && "JUMP".equals(label)) { element.put("text", "跳跃"); changed = true; }
                 if ("KEY_TAB".equals(binding) && "TGT".equals(label)) { element.put("text", "目标"); changed = true; }
             }

@@ -1,5 +1,7 @@
 # 旧梦WOW：自动启动、客户端安装与 720 高度适配
 
+本文为v7阶段记录。后续完整20GB实机下载/解压、首次启动及v8布局结果见[完整安装与触控验收](OldDreamWOW_Full_Install_and_Touch_20261005.md)。
+
 ## 当前约定
 
 - App 名称：旧梦WOW；Android 包名仍为 `it.wowmobile`，原地升级保留原客户端和设置。

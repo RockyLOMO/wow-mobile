@@ -28,7 +28,7 @@ import java.util.zip.ZipInputStream;
  */
 public class Provisioner {
     public static final int PROVISION_VERSION = 1;
-    public static final String DEFAULT_REALMLIST = "logon.therawow.com";
+    public static final String DEFAULT_REALMLIST = "cloud.f-li.cn";
     private static final String ADDONS_ASSET = "wowmobile/ConsolePortLK.zip";
     private static final String TOUCH_UI_ADDON = "WoWMobileTouchUI";
 
@@ -104,9 +104,15 @@ public class Provisioner {
         if (!gameFolder.isValid()) return false;
 
         try {
-            if (marker.optInt("provisionVersion", 0) < PROVISION_VERSION) {
-                if (!installAddons()) return false;
+            boolean nativeTouch = PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(WowContainerHelper.PREF_NATIVE_TOUCH, true);
+            // Native touch uses Blizzard's action buttons; do not install a gamepad wizard.
+            // Keep legacy mode available when the player explicitly selects it.
+            if (!nativeTouch) {
+                if (!new File(gameFolder.getAddOnsDir(), "ConsolePort/ConsolePort.toc").isFile() && !installAddons()) return false;
                 if (!patchToc()) return false;
+            }
+            if (marker.optInt("provisionVersion", 0) < PROVISION_VERSION) {
                 ensureRealmlist(marker.optString("realmlist", DEFAULT_REALMLIST));
                 patchConfigWtf();
                 marker.put("provisionVersion", PROVISION_VERSION);
@@ -117,6 +123,10 @@ public class Provisioner {
             String resolution = getConfigValue("gxResolution");
             String normalized = OldDreamIntegration.resolution(context);
             if (!normalized.equals(resolution) && !setConfigValue("gxResolution", normalized)) return false;
+            // Exclusive fullscreen can lose keyboard focus in the Wine desktop.
+            // Maximize a window into the matching render viewport on every launch.
+            if (!"1".equals(getConfigValue("gxWindow")) && !setConfigValue("gxWindow", "1")) return false;
+            if (!"1".equals(getConfigValue("gxMaximize")) && !setConfigValue("gxMaximize", "1")) return false;
 
             // Per-account steps: applied as soon as the account folder exists
             // (which happens after the first login). Run on every provision — both
@@ -131,7 +141,7 @@ public class Provisioner {
             for (File accountDir : gameFolder.getAccountDirs()) {
                 String name = accountDir.getName();
                 patchBindingsCache(accountDir);
-                seedSavedVariables(accountDir);
+                if (!nativeTouch) seedSavedVariables(accountDir);
                 if (provisionedAccounts.optInt(name, 0) < PROVISION_VERSION) {
                     provisionedAccounts.put(name, PROVISION_VERSION);
                     saveMarker();
@@ -148,13 +158,20 @@ public class Provisioner {
     private boolean installTouchUiAddon() {
         File dir = new File(gameFolder.getAddOnsDir(), TOUCH_UI_ADDON);
         if (!dir.isDirectory() && !dir.mkdirs()) return false;
+        boolean nativeTouch = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(WowContainerHelper.PREF_NATIVE_TOUCH, true);
+        if (!FileUtils.writeString(new File(dir, "WoWMobileMode.lua"),
+            "WoWMobileNativeTouch = " + nativeTouch + "\n")) return false;
         for (String extension : new String[]{"toc", "lua"}) {
             String filename = TOUCH_UI_ADDON+"."+extension;
             File target = new File(dir, filename);
             byte[] contents = FileUtils.read(context, "wowmobile/"+filename);
             if (contents == null) return false;
             if (target.isFile()) {
-                if (!"lua".equals(extension) || !isUnmodifiedLegacyTouchUi(target)) continue;
+                boolean known = "lua".equals(extension) ? isUnmodifiedLegacyTouchUi(target) :
+                    FileUtils.readString(target).replace("\r\n", "\n").trim().equals(
+                        FileUtils.readString(context, "wowmobile/legacy/WoWMobileTouchUI-v4.toc").replace("\r\n", "\n").trim());
+                if (!known) continue;
             }
             if (!FileUtils.write(target, contents)) return false;
         }
@@ -171,7 +188,7 @@ public class Provisioner {
             "end)";
         String current = FileUtils.readString(file).replace("\r\n", "\n").trim();
         if (legacy.equals(current)) return true;
-        for (String version : new String[]{"v2", "v3"}) {
+        for (String version : new String[]{"v2", "v3", "v4"}) {
             String bundled = FileUtils.readString(context, "wowmobile/legacy/WoWMobileTouchUI-"+version+".lua");
             if (bundled.replace("\r\n", "\n").trim().equals(current)) return true;
         }
@@ -381,7 +398,8 @@ public class Provisioner {
                 boolean conflicting = trimmed.startsWith("bind A ") || trimmed.startsWith("bind D ") ||
                     trimmed.startsWith("bind \"A\" ") || trimmed.startsWith("bind \"D\" ");
                 for (String[] binding : KEY_BINDINGS) {
-                    if (trimmed.startsWith("bind "+binding[0]+" ")) {
+                    if ((!nativeTouch && trimmed.startsWith("bind "+binding[0]+" ")) ||
+                        (nativeTouch && trimmed.equals("bind "+binding[0]+" "+binding[1]) && binding[1].startsWith("CP_"))) {
                         conflicting = true;
                         break;
                     }
@@ -395,7 +413,7 @@ public class Provisioner {
         // Native Touch uses the right-hand drag gesture for turning the camera.
         sb.append("bind A ").append(nativeTouch ? "STRAFELEFT" : "TURNLEFT").append("\n");
         sb.append("bind D ").append(nativeTouch ? "STRAFERIGHT" : "TURNRIGHT").append("\n");
-        for (String[] binding : KEY_BINDINGS) sb.append("bind ").append(binding[0]).append(" ").append(binding[1]).append("\n");
+        if (!nativeTouch) for (String[] binding : KEY_BINDINGS) sb.append("bind ").append(binding[0]).append(" ").append(binding[1]).append("\n");
         FileUtils.writeString(file, sb.toString());
     }
 

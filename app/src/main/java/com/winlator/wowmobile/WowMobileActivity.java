@@ -44,6 +44,7 @@ public class WowMobileActivity extends AppCompatActivity {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         autoConsumed = state != null && state.getBoolean("autoConsumed");
         if (getIntent().getBooleanExtra("skip_auto_launch", false)) autoConsumed = true;
+        if (getIntent().getBooleanExtra("resume_install", false)) autoConsumed = false;
         createView();
         requestPermissionsIfNeeded();
     }
@@ -104,6 +105,7 @@ public class WowMobileActivity extends AppCompatActivity {
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent); setIntent(intent);
         if (intent.getBooleanExtra("skip_auto_launch",false)) { autoConsumed=true; launching=false; }
+        if (intent.getBooleanExtra("resume_install",false)) autoConsumed=false;
         updateStatus();
     }
     @Override protected void onResume() { super.onResume(); resumed=true; handler.post(ticker); }
@@ -153,8 +155,9 @@ public class WowMobileActivity extends AppCompatActivity {
         } else {
             status.setText("尚未找到完整客户端");
             long saved=new File(ClientInstallService.cache(),"client.zip.part").length();
-            detail.setText("复制完整 3.3.5a 简体中文客户端到上述目录，或下载并自动解压。\n下载约20 GB，建议预留45 GB空间。已有文件不会被覆盖。"+(saved>0 ? String.format(Locale.CHINA,"\n已保留 %.2f GB 下载，点击继续安装。",saved/1e9):""));
-            download.setText(saved>0 ? "继续安装":"下载完整客户端");
+            boolean archiveSaved=new File(ClientInstallService.cache(),"client.zip").isFile();
+            detail.setText("复制完整 3.3.5a 简体中文客户端到上述目录，或下载并自动解压。\n下载约20 GB，建议预留45 GB空间。已有文件不会被覆盖。"+(archiveSaved ? "\n完整压缩包已保留，点击继续解压。" : saved>0 ? String.format(Locale.CHINA,"\n已保留 %.2f GB 下载，点击继续安装。",saved/1e9):""));
+            download.setText(saved>0 || archiveSaved ? "继续安装":"下载完整客户端");
         }
     }
     private void downloadOrPause() {

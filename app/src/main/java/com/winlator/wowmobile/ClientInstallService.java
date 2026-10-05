@@ -73,7 +73,7 @@ public final class ClientInstallService extends Service {
                 terminal = new Snapshot("paused", "已暂停，点击继续；解压阶段将重新开始，下载文件会保留。", old.done, old.total, 0, false);
             } catch (Exception e) {
                 Snapshot old = snapshot;
-                terminal = new Snapshot("error", e.getMessage() == null ? "安装失败，请重试。" : e.getMessage(), old.done, old.total, 0, false);
+                terminal = new Snapshot("error", errorMessage(e), old.done, old.total, 0, false);
             }
             final Snapshot finished = terminal;
             new Handler(Looper.getMainLooper()).post(() -> {
@@ -87,6 +87,15 @@ public final class ClientInstallService extends Service {
         }, "oldDream-client-install").start();
         return START_NOT_STICKY;
     }
+    private static String errorMessage(Exception error) {
+        for (Throwable cause = error; cause != null; cause = cause.getCause()) {
+            if (cause instanceof java.net.SocketException || cause instanceof java.net.SocketTimeoutException ||
+                cause instanceof java.net.UnknownHostException) {
+                return "网络连接中断，已保存下载进度；请恢复网络后继续安装。";
+            }
+        }
+        return error.getMessage() == null ? "安装失败，请重试。" : error.getMessage();
+    }
     private void progress(String phase, long done, long total, String detail) {
         long now = SystemClock.elapsedRealtime();
         if (!phase.equals(speedPhase)) { speedPhase=phase; speedStart=now; speedBytes=done; }
@@ -95,7 +104,7 @@ public final class ClientInstallService extends Service {
         getSystemService(NotificationManager.class).notify(NOTIFICATION, notification(snapshot));
     }
     private Notification notification(Snapshot state) {
-        Intent open = new Intent(this, WowMobileActivity.class).putExtra("skip_auto_launch", true);
+        Intent open = new Intent(this, WowMobileActivity.class).putExtra("resume_install", true);
         PendingIntent content = PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         PendingIntent pause = PendingIntent.getService(this, 1, new Intent(this, ClientInstallService.class).setAction(PAUSE), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         return new Notification.Builder(this, CHANNEL).setSmallIcon(android.R.drawable.stat_sys_download)

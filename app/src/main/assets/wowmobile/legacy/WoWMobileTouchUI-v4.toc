@@ -1,5 +1,4 @@
 ## Interface: 30300
 ## Title: WoW Mobile Touch UI
 ## Notes: Enlarges interface text and action bar for touch input.
-WoWMobileMode.lua
 WoWMobileTouchUI.lua
