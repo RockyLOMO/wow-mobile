@@ -170,8 +170,12 @@ public class Provisioner {
             "    end\n"+
             "end)";
         String current = FileUtils.readString(file).replace("\r\n", "\n").trim();
-        String v2 = FileUtils.readString(context, "wowmobile/legacy/WoWMobileTouchUI-v2.lua");
-        return legacy.equals(current) || v2.replace("\r\n", "\n").trim().equals(current);
+        if (legacy.equals(current)) return true;
+        for (String version : new String[]{"v2", "v3"}) {
+            String bundled = FileUtils.readString(context, "wowmobile/legacy/WoWMobileTouchUI-"+version+".lua");
+            if (bundled.replace("\r\n", "\n").trim().equals(current)) return true;
+        }
+        return false;
     }
 
     /** Extracts the bundled ConsolePortLK release into Interface/AddOns. */

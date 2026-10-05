@@ -131,8 +131,8 @@ public class WowContainerHelper {
 
         int profileId = getControlsProfileId();
         if (profileId > 0) content += "controlsProfile="+profileId+"\n";
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_NATIVE_TOUCH, true))
-            content += "stretchFullscreen=1\n";
+        // Keep the same aspect ratio on every device rather than stretching the game.
+        content += "preserveAspectRatio=1\n";
 
         FileUtils.writeString(shortcutFile, content);
         return shortcutFile;

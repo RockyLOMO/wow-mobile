@@ -41,12 +41,23 @@ public final class TouchCoordinateMapperTest {
         mapper.mapPoint(360, 760, point);
         check(640, point[0]);
         check(512, point[1]);
-        if (!"1280x1024".equals(WowResolution.normalize("1280x1024")) ||
-            !"1366x768".equals(WowResolution.normalize("1366x768")) ||
-            !WowResolution.DEFAULT.equals(WowResolution.normalize("960x432")) ||
-            !WowResolution.DEFAULT.equals(WowResolution.normalize("bad")))
-            throw new AssertionError("Resolution preservation/minimum failed");
-        System.out.println("PASS: stretched/fit/zoom/pan/orientation/clamp/delta mapping and resolution preservation");
+        // One 720p scene on phone/tablet displays, with the same touch coordinate policy.
+        for (int[] display : new int[][]{{1520, 720}, {1600, 720}, {1920, 1080}, {1920, 1200}, {1024, 768}}) {
+            fit.update(display[0], display[1], 1280, 720);
+            top = display[1] - fit.viewOffsetY - fit.viewHeight;
+            mapper.update(display[1], fit.viewOffsetX, fit.viewOffsetY, fit.viewWidth, fit.viewHeight,
+                1280, 720, 1, 0, 0);
+            mapper.mapPoint(fit.viewOffsetX + fit.viewWidth * .25f, top + fit.viewHeight * .9f, point);
+            check(320, point[0]);
+            check(648, point[1]);
+            if (Math.abs(fit.viewWidth * 720 - fit.viewHeight * 1280) > 1280)
+                throw new AssertionError("Aspect ratio changed beyond pixel rounding");
+        }
+        for (String previous : new String[]{"1280x1024", "1366x768", "960x432", "1280x720", "bad", null}) {
+            if (!WowResolution.DEFAULT.equals(WowResolution.normalize(previous)))
+                throw new AssertionError("Fixed 720p migration failed");
+        }
+        System.out.println("PASS: touch transforms, five display aspect ratios and fixed 720p migration");
     }
 
     private static void check(float expected, float actual) {

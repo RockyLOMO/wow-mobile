@@ -23,7 +23,6 @@ import java.util.LinkedHashSet;
  * Edits WoW's own configuration (Config.wtf + realmlist.wtf) while the game is off.
  */
 public class WowSettingsActivity extends AppCompatActivity {
-    private static final String[] RESOLUTIONS = {"1280x720", "1280x1024", "1520x720", "1600x720", "1920x1080"};
     private static final String[] FARCLIP_LABELS = {"Near (fastest)", "Medium", "Far (slower)"};
     private static final String[] FARCLIP_VALUES = {"400", "727", "1000"};
 
@@ -125,10 +124,9 @@ public class WowSettingsActivity extends AppCompatActivity {
 
     private void loadGraphics() {
         String resolution = WowResolution.normalize(provisioner.getConfigValue("gxResolution"));
-        ArrayList<String> resolutions = new ArrayList<>(java.util.Arrays.asList(RESOLUTIONS));
-        if (!resolutions.contains(resolution)) resolutions.add(resolution);
-        sResolution.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, resolutions));
-        sResolution.setSelection(resolutions.indexOf(resolution));
+        sResolution.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+            new String[]{resolution}));
+        sResolution.setEnabled(false);
 
         sFarclip.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, FARCLIP_LABELS));
         String farclip = provisioner.getConfigValue("farclip");

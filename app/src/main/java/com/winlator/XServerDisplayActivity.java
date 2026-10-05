@@ -358,6 +358,11 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
                 drawerLayout.closeDrawers();
                 break;
             case R.id.menu_item_toggle_fullscreen:
+                if (shortcut != null && shortcut.getExtra("preserveAspectRatio", "0").equals("1")) {
+                    AppUtils.showToast(this, R.string.wow_preserve_aspect_ratio);
+                    drawerLayout.closeDrawers();
+                    break;
+                }
                 renderer.toggleFullscreen();
                 drawerLayout.closeDrawers();
                 break;
@@ -574,8 +579,6 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
         renderer.setCursorColor(preferences.getInt("cursor_color", 0xffffff));
         renderer.setCursorScale(preferences.getFloat("cursor_scale", 1.0f));
         renderer.setForceWindowsFullscreen(shortcut != null && shortcut.getExtra("forceFullscreen", "0").equals("1"));
-        if (shortcut != null && shortcut.getExtra("stretchFullscreen", "0").equals("1"))
-            renderer.toggleFullscreen();
 
         xServer.setRenderer(renderer);
         rootView.addView(xServerView);

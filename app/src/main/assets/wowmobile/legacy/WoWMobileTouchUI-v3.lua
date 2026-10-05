@@ -1,4 +1,4 @@
--- WoW Mobile Touch UI v4 (Old Dream, 1280x720)
+-- WoW Mobile Touch UI v3
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:RegisterEvent("DISPLAY_SIZE_CHANGED")
@@ -11,24 +11,13 @@ local function updateLayout()
         local available = UIParent:GetWidth() - 48
         MainMenuBar:SetScale(math.min(1.35, available / MainMenuBar:GetWidth()))
     end
-    -- Enlarge text objects without changing panel geometry or UIParent's scale.
-    for _, entry in ipairs({
-        {"GameFontNormal", 13}, {"GameFontHighlight", 13}, {"GameFontDisable", 13},
-        {"GameTooltipText", 14}, {"GameTooltipHeaderText", 16}, {"GameTooltipTextSmall", 12}
-    }) do
-        local font = _G[entry[1]]
-        if font then
-            local path, size, flags = font:GetFont()
-            if path and size and size < entry[2] then font:SetFont(path, entry[2], flags) end
-        end
-    end
     if FCF_SetChatWindowFontSize then
         for i = 1, 2 do
             local chatFrame = _G["ChatFrame" .. i]
             if chatFrame then
                 local _, size = chatFrame:GetFont()
-                if size and size < 16 then
-                    FCF_SetChatWindowFontSize(nil, chatFrame, 16)
+                if size and size < 14 then
+                    FCF_SetChatWindowFontSize(nil, chatFrame, 14)
                 end
             end
         end
