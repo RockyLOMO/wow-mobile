@@ -1,6 +1,8 @@
 package com.winlator.wowmobile;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -31,6 +33,8 @@ final class OldDreamStartupView extends FrameLayout {
     private final Bitmap sample=Bitmap.createBitmap(96,54,Bitmap.Config.ARGB_8888);
     private final int[] pixels=new int[96*54];
     private final long started=SystemClock.elapsedRealtime();
+    private final SharedPreferences history;
+    private final long previousDuration;
     private final TextView elapsed, hint, loadingText, percentage;
     private final ProgressBar progress;
     private final Button reveal;
@@ -41,6 +45,8 @@ final class OldDreamStartupView extends FrameLayout {
     OldDreamStartupView(Activity activity, XServerView surface) {
         super(activity);
         this.surface=surface;
+        history=activity.getSharedPreferences("olddream_startup",Context.MODE_PRIVATE);
+        previousDuration=history.getLong("last_success_ms",StartupProgress.DEFAULT_DURATION_MS);
         setLayoutParams(new FrameLayout.LayoutParams(-1,-1));
         setClickable(true);
         setBackgroundColor(0xff081117);
@@ -69,8 +75,7 @@ final class OldDreamStartupView extends FrameLayout {
         loadingParams.topMargin=dp(24);
         panel.addView(loading,loadingParams);
         loadingText=text(loading,"正在启动游戏…",20,Color.WHITE);
-        elapsed=text(panel,"已等待 0 秒",14,0xffc5d1d7);
-        hint=text(panel,"启动可能需要30–60秒，请稍候。",14,0xffa9bcc7);
+        hint=text(panel,"预计30–120秒，请稍候。",14,0xffa9bcc7);
         hint.setMaxWidth(dp(360));
 
         LinearLayout actions=new LinearLayout(activity);
@@ -89,15 +94,15 @@ final class OldDreamStartupView extends FrameLayout {
         LinearLayout labels=new LinearLayout(activity);
         labels.setGravity(Gravity.CENTER_VERTICAL);
         bottom.addView(labels,new LinearLayout.LayoutParams(-1,-2));
-        TextView caption=text(labels,"预计启动进度",14,0xffc5d1d7);
-        caption.setLayoutParams(new LinearLayout.LayoutParams(0,-2,1));
+        elapsed=text(labels,"00:00",14,0xffc5d1d7);
+        elapsed.setLayoutParams(new LinearLayout.LayoutParams(0,-2,1));
         percentage=text(labels,"0.00%",14,0xffd3b47d);
         progress=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);
         progress.setMax(10000);
         progress.setProgressTintList(ColorStateList.valueOf(0xffd3b47d));
         progress.setProgressBackgroundTintList(ColorStateList.valueOf(0x66c5d1d7));
         bottom.addView(progress,new LinearLayout.LayoutParams(-1,dp(8)));
-        Log.i("OldDreamStartup","Loading overlay shown");
+        Log.i("OldDreamStartup","Loading overlay shown; previousDurationMs="+previousDuration);
     }
 
     private int dp(int value) { return Math.round(value*getResources().getDisplayMetrics().density); }
@@ -130,12 +135,11 @@ final class OldDreamStartupView extends FrameLayout {
     private void checkFrame() {
         if (closed || finished || inFlight) return;
         long waited=SystemClock.elapsedRealtime()-started;
-        long seconds=waited/1000;
-        elapsed.setText(String.format(Locale.CHINA,"已等待 %d 秒",seconds));
-        int estimated=StartupProgress.estimate(waited);
+        elapsed.setText(StartupProgress.elapsedText(waited));
+        int estimated=StartupProgress.estimate(waited,previousDuration);
         progress.setProgress(estimated,true);
         percentage.setText(String.format(Locale.CHINA,"%.2f%%",estimated/100.0));
-        if (seconds>=60) {
+        if (StartupProgress.showManualReveal(waited)) {
             hint.setText("加载耗时较久，仍在等待游戏画面。\n可继续等待，或查看游戏画面确认状态。");
             reveal.setVisibility(View.VISIBLE);
         }
@@ -163,6 +167,9 @@ final class OldDreamStartupView extends FrameLayout {
         if (closed || finished) return;
         finished=true; handler.removeCallbacks(poll);
         if (ready) {
+            long duration=SystemClock.elapsedRealtime()-started;
+            history.edit().putLong("last_success_ms",duration).apply();
+            elapsed.setText(StartupProgress.elapsedText(duration));
             progress.setProgress(10000,true); percentage.setText("100.00%");
             loadingText.setText("加载完成，即将进入游戏…");
         }
