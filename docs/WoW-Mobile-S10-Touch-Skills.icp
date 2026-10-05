@@ -1,0 +1,279 @@
+{
+  "id": 5,
+  "name": "WoW ConsolePortLK",
+  "cursorSpeed": 1.25,
+  "elements": [
+    {
+      "type": "D_PAD",
+      "shape": "CIRCLE",
+      "bindings": [
+        "KEY_W",
+        "KEY_D",
+        "KEY_S",
+        "KEY_A"
+      ],
+      "scale": 1.35,
+      "x": 0.105,
+      "y": 0.72,
+      "toggleSwitch": false,
+      "text": "",
+      "iconId": 0,
+      "opacity": 0.65
+    },
+    {
+      "type": "BUTTON",
+      "shape": "CIRCLE",
+      "bindings": [
+        "KEY_1",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 1.02,
+      "x": 0.74,
+      "y": 0.6,
+      "toggleSwitch": false,
+      "text": "1",
+      "iconId": 0,
+      "opacity": 0.75
+    },
+    {
+      "type": "BUTTON",
+      "shape": "CIRCLE",
+      "bindings": [
+        "KEY_2",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 1.02,
+      "x": 0.84,
+      "y": 0.6,
+      "toggleSwitch": false,
+      "text": "2",
+      "iconId": 0,
+      "opacity": 0.75
+    },
+    {
+      "type": "BUTTON",
+      "shape": "CIRCLE",
+      "bindings": [
+        "KEY_3",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 1.02,
+      "x": 0.94,
+      "y": 0.6,
+      "toggleSwitch": false,
+      "text": "3",
+      "iconId": 0,
+      "opacity": 0.75
+    },
+    {
+      "type": "BUTTON",
+      "shape": "CIRCLE",
+      "bindings": [
+        "KEY_4",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 1.02,
+      "x": 0.74,
+      "y": 0.79,
+      "toggleSwitch": false,
+      "text": "4",
+      "iconId": 0,
+      "opacity": 0.75
+    },
+    {
+      "type": "BUTTON",
+      "shape": "CIRCLE",
+      "bindings": [
+        "KEY_5",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 1.02,
+      "x": 0.84,
+      "y": 0.79,
+      "toggleSwitch": false,
+      "text": "5",
+      "iconId": 0,
+      "opacity": 0.75
+    },
+    {
+      "type": "BUTTON",
+      "shape": "CIRCLE",
+      "bindings": [
+        "KEY_6",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 1.02,
+      "x": 0.94,
+      "y": 0.79,
+      "toggleSwitch": false,
+      "text": "6",
+      "iconId": 0,
+      "opacity": 0.75
+    },
+    {
+      "type": "BUTTON",
+      "shape": "ROUND_RECT",
+      "bindings": [
+        "KEY_TAB",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 0.9,
+      "x": 0.31,
+      "y": 0.88,
+      "toggleSwitch": false,
+      "text": "选怪",
+      "iconId": 0,
+      "opacity": 0.8
+    },
+    {
+      "type": "BUTTON",
+      "shape": "ROUND_RECT",
+      "bindings": [
+        "KEY_SPACE",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 0.9,
+      "x": 0.21,
+      "y": 0.88,
+      "toggleSwitch": false,
+      "text": "跳",
+      "iconId": 0,
+      "opacity": 0.8
+    },
+    {
+      "type": "BUTTON",
+      "shape": "ROUND_RECT",
+      "bindings": [
+        "KEY_F",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 0.9,
+      "x": 0.42,
+      "y": 0.88,
+      "toggleSwitch": false,
+      "text": "F互动",
+      "iconId": 0,
+      "opacity": 0.8
+    },
+    {
+      "type": "BUTTON",
+      "shape": "ROUND_RECT",
+      "bindings": [
+        "MOUSE_LEFT_BUTTON",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 0.85,
+      "x": 0.53,
+      "y": 0.88,
+      "toggleSwitch": false,
+      "text": "左键",
+      "iconId": 0,
+      "opacity": 0.7
+    },
+    {
+      "type": "BUTTON",
+      "shape": "ROUND_RECT",
+      "bindings": [
+        "MOUSE_RIGHT_BUTTON",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 0.85,
+      "x": 0.63,
+      "y": 0.88,
+      "toggleSwitch": false,
+      "text": "右键",
+      "iconId": 0,
+      "opacity": 0.7
+    },
+    {
+      "type": "BUTTON",
+      "shape": "ROUND_RECT",
+      "bindings": [
+        "MOUSE_RIGHT_BUTTON",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 0.85,
+      "x": 0.51,
+      "y": 0.1,
+      "toggleSwitch": true,
+      "text": "镜头",
+      "iconId": 0,
+      "opacity": 0.7
+    },
+    {
+      "type": "BUTTON",
+      "shape": "ROUND_RECT",
+      "bindings": [
+        "KEY_ESC",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 0.85,
+      "x": 0.07,
+      "y": 0.1,
+      "toggleSwitch": false,
+      "text": "菜单",
+      "iconId": 0,
+      "opacity": 0.7
+    },
+    {
+      "type": "BUTTON",
+      "shape": "ROUND_RECT",
+      "bindings": [
+        "KEY_B",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 0.85,
+      "x": 0.17,
+      "y": 0.1,
+      "toggleSwitch": false,
+      "text": "背包",
+      "iconId": 0,
+      "opacity": 0.7
+    },
+    {
+      "type": "BUTTON",
+      "shape": "ROUND_RECT",
+      "bindings": [
+        "KEY_M",
+        "NONE",
+        "NONE",
+        "NONE"
+      ],
+      "scale": 0.85,
+      "x": 0.92,
+      "y": 0.1,
+      "toggleSwitch": false,
+      "text": "地图",
+      "iconId": 0,
+      "opacity": 0.7
+    }
+  ]
+}

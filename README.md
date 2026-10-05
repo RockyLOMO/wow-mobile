@@ -44,6 +44,10 @@ Grab the APK from [Releases](../../releases) and sideload it.
 You need to provide your own World of Warcraft 3.3.5a (build 12340) client
 folder on the phone's storage. No game files are distributed with this app.
 
+## Local S10 notes
+
+Local S10 deployment notes, screenshots, touch layouts and test APKs are listed in [docs/README.md](docs/README.md).
+
 ## Controls layout
 
 | Touch button | Key sent | ConsolePort action |
