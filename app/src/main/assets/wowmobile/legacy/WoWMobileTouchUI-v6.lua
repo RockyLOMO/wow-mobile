@@ -1,4 +1,4 @@
--- WoW Mobile Touch UI v7 (Old Dream, adaptive width / 720p)
+-- WoW Mobile Touch UI v6 (Old Dream, adaptive width / 720p)
 local frame = CreateFrame("Frame")
 local dirty, applying = true, false
 frame:RegisterEvent("PLAYER_LOGIN")
@@ -40,8 +40,6 @@ local function updateLayout()
                     button:ClearAllPoints()
                     button:SetPoint("TOPRIGHT", bar, "TOPRIGHT",
                         -math.floor((i - 1) / 6) * (width + gap), -((i - 1) % 6) * (height + gap))
-                    -- Fill half the inter-button gap on each side without overlapping neighbours.
-                    button:SetHitRectInsets(-gap / 2, -gap / 2, -gap / 2, -gap / 2)
                 end
             end
         end
@@ -73,8 +71,6 @@ local function updateLayout()
 end
 frame:SetScript("OnEvent", function(_, event)
     if event == "PLAYER_LOGIN" and WoWMobileNativeTouch ~= false then
-        -- A missed skill tap landing on the ground must not clear the current target.
-        SetCVar("deselectOnClick", "0")
         local reload = false
         for i = 1, GetNumAddOns() do
             local name, _, _, enabled = GetAddOnInfo(i)

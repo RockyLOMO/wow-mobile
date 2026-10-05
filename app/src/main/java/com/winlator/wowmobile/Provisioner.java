@@ -188,7 +188,7 @@ public class Provisioner {
             "end)";
         String current = FileUtils.readString(file).replace("\r\n", "\n").trim();
         if (legacy.equals(current)) return true;
-        for (String version : new String[]{"v2", "v3", "v4", "v5", "v5-early"}) {
+        for (String version : new String[]{"v2", "v3", "v4", "v5", "v5-early", "v6"}) {
             String bundled = FileUtils.readString(context, "wowmobile/legacy/WoWMobileTouchUI-"+version+".lua");
             if (bundled.replace("\r\n", "\n").trim().equals(current)) return true;
         }
