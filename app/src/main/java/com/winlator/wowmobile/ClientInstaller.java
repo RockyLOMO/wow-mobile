@@ -16,12 +16,27 @@ import java.util.zip.CRC32;
 public final class ClientInstaller {
     public static final String URL = "https://cloud.f-li.cn:6500/wow/WoW-3.3.5a-zhCN.zip";
     public static final long RESERVE = 3L * 1024 * 1024 * 1024;
+    public static final long MIN_FREE_BYTES = 20_000_000_000L;
     private static final int BUFFER = 256 * 1024;
     public interface Progress { void update(String phase, long done, long total, String detail); }
     public interface ReadyCheck { boolean valid(File folder); }
     public static final class Paused extends IOException {}
     private static final class InvalidArchive extends IOException {
         InvalidArchive(String message) { super(message); }
+    }
+
+    /** A missing cache directory must not be mistaken for a full storage volume. */
+    public static long availableSpace(File path) {
+        File existing = path.getAbsoluteFile();
+        while (!existing.isDirectory() && existing.getParentFile() != null) existing = existing.getParentFile();
+        return existing.getUsableSpace();
+    }
+
+    public static String lowSpaceMessage(long available) {
+        if (available >= MIN_FREE_BYTES) return null;
+        return String.format(Locale.CHINA,
+            "当前可用空间 %.1f GB，少于20 GB，无法安装完整客户端。\n请清理空间后重试；全新下载加解压建议预留45 GB。",
+            Math.max(0, available) / 1_000_000_000.0);
     }
 
     /** Fast checks against the five immutable base files in the distributed 3.3.5a client. */

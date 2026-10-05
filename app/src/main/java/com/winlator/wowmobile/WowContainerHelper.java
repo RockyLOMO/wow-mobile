@@ -183,8 +183,13 @@ public class WowContainerHelper {
                     element.put("x", center / (double)maxWidth);
                     changed = true;
                 }
-                if (("KEY_SPACE".equals(binding) || "KEY_TAB".equals(binding)) && Math.abs(x - 0.94) < 0.0001) {
-                    element.put("x", 0.81);
+                if (("KEY_SPACE".equals(binding) || "KEY_TAB".equals(binding)) &&
+                    (Math.abs(x - 0.94) < 0.0001 || Math.abs(x - 0.81) < 0.0001)) {
+                    // Right edges sit about two pixels from the enlarged four-column block on S10.
+                    element.put("x", "KEY_SPACE".equals(binding) ? 1272.0 / 1515 : 1258.0 / 1515);
+                    double y = element.optDouble("y");
+                    if ("KEY_SPACE".equals(binding) && Math.abs(y - 0.76) < 0.0001) element.put("y", 482.0 / 720);
+                    if ("KEY_TAB".equals(binding) && Math.abs(y - 0.59) < 0.0001) element.put("y", 0.52);
                     changed = true;
                 }
                 if ("KEY_SPACE".equals(binding) && "JUMP".equals(label)) { element.put("text", "跳跃"); changed = true; }

@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.*;
 import android.content.pm.PackageManager;
 import android.os.*;
+import android.net.Uri;
+import android.provider.Settings;
 import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -28,9 +30,11 @@ public class WowMobileActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     private TextView status, detail, folder;
     private ProgressBar progress;
-    private Button play, download, select, detect, settings, containerSettings;
+    private Button play, download, select, detect, settings, containerSettings, background;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean autoConsumed, launching, resumed;
+    private boolean backgroundPromptVisible, backgroundSettingsOpen;
+    private static final String PREF_BACKGROUND_PROMPT = "oldDream_background_prompt_seen";
     private int launchToken;
     private String launchError;
     private static boolean rootInstallStarted;
@@ -71,6 +75,7 @@ public class WowMobileActivity extends AppCompatActivity {
         select = button(panel,"选择现有客户端目录", this::showFolderPicker);
         settings=button(panel,"游戏设置", () -> openSettings(WowSettingsActivity.class));
         containerSettings=button(panel,"容器设置", () -> openSettings(ContainerSettingsActivity.class));
+        background=button(panel,"一键允许后台运行", () -> { autoConsumed=true; openBackgroundSettings(); });
         button(panel,"关闭应用", this::finishAndRemoveTask);
         icon.setOnLongClickListener(v -> { openSettings(MainActivity.class); return true; });
         setContentView(scroll);
@@ -108,7 +113,7 @@ public class WowMobileActivity extends AppCompatActivity {
         if (intent.getBooleanExtra("resume_install",false)) autoConsumed=false;
         updateStatus();
     }
-    @Override protected void onResume() { super.onResume(); resumed=true; handler.post(ticker); }
+    @Override protected void onResume() { super.onResume(); resumed=true; backgroundSettingsOpen=false; handler.post(ticker); }
     @Override protected void onPause() { resumed=false; launchToken++; launching=false; handler.removeCallbacks(ticker); super.onPause(); }
     @Override protected void onDestroy() { handler.removeCallbacksAndMessages(null); super.onDestroy(); }
     public GameFolder getGameFolder() {
@@ -122,11 +127,15 @@ public class WowMobileActivity extends AppCompatActivity {
         return null;
     }
     private void updateStatus() {
+        boolean backgroundAllowed=((PowerManager)getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName());
+        background.setText(backgroundAllowed ? "后台运行已允许" : "一键允许后台运行");
+        background.setEnabled(!backgroundAllowed);
         if (!permissionGranted()) {
             status.setText("需要存储权限以读取客户端"); detail.setText("请允许存储权限后重新检测。");
             play.setEnabled(false); download.setEnabled(false); detect.setOnClickListener(v -> requestPermissionsIfNeeded()); return;
         }
         detect.setOnClickListener(v -> { launchError=null; autoConsumed=false; updateStatus(); });
+        maybePromptBackgroundExecution();
         GameFolder game=getGameFolder();
         ClientInstallService.Snapshot state=ClientInstallService.snapshot;
         boolean ready=game!=null;
@@ -144,7 +153,7 @@ public class WowMobileActivity extends AppCompatActivity {
         if (ready && !state.running) {
             status.setText(launchError==null ? "客户端已就绪" : "启动失败");
             detail.setText(launchError==null ? "分辨率 "+OldDreamIntegration.resolution(this)+" · 退出后可在这里调整设置。" : launchError);
-            if (!autoConsumed && resumed && !state.running) { autoConsumed=true; handler.post(this::onPlay); }
+            if (!autoConsumed && resumed && !state.running && !backgroundPromptVisible && !backgroundSettingsOpen) { autoConsumed=true; handler.post(this::onPlay); }
             return;
         }
         if (state.running || "paused".equals(state.phase) || "error".equals(state.phase)) {
@@ -160,10 +169,51 @@ public class WowMobileActivity extends AppCompatActivity {
             download.setText(saved>0 || archiveSaved ? "继续安装":"下载完整客户端");
         }
     }
+    private void maybePromptBackgroundExecution() {
+        if (!resumed || backgroundPromptVisible || backgroundSettingsOpen ||
+                preferences.getBoolean(PREF_BACKGROUND_PROMPT,false)) return;
+        PowerManager power=(PowerManager)getSystemService(POWER_SERVICE);
+        if (power.isIgnoringBatteryOptimizations(getPackageName())) return;
+        backgroundPromptVisible=true;
+        AlertDialog dialog=new AlertDialog.Builder(this).setTitle("允许后台运行")
+            .setMessage("下载和解压客户端需要较长时间，建议允许旧梦WOW后台运行。\n\n点击‘一键设置’，在系统授权框里点‘允许’，即可解除电池优化限制。三星等手机还可将本应用移出‘休眠应用’。\n\n安装期间会显示进度通知；被中断后可继续安装。")
+            .setPositiveButton("一键设置",(d,w) -> openBackgroundSettings())
+            .setNegativeButton("稍后",(d,w) -> {})
+            .create();
+        dialog.setOnDismissListener(d -> {
+            backgroundPromptVisible=false;
+            preferences.edit().putBoolean(PREF_BACKGROUND_PROMPT,true).apply();
+            updateStatus();
+        });
+        dialog.show();
+    }
+    private void openBackgroundSettings() {
+        PowerManager power=(PowerManager)getSystemService(POWER_SERVICE);
+        Intent intent=power.isIgnoringBatteryOptimizations(getPackageName())
+            ? new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+getPackageName()))
+            : new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,Uri.parse("package:"+getPackageName()));
+        backgroundSettingsOpen=true;
+        try { startActivity(intent); }
+        catch (ActivityNotFoundException | SecurityException e) {
+            try { startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+getPackageName()))); }
+            catch (ActivityNotFoundException unavailable) {
+                backgroundSettingsOpen=false;
+                Toast.makeText(this,"请在系统设置中允许旧梦WOW后台运行。",Toast.LENGTH_LONG).show();
+            }
+        }
+    }
     private void downloadOrPause() {
         Intent intent=new Intent(this,ClientInstallService.class);
         if (ClientInstallService.snapshot.running) { intent.setAction(ClientInstallService.PAUSE); startService(intent); }
-        else { autoConsumed=false; ContextCompat.startForegroundService(this,intent); }
+        else {
+            String warning=ClientInstaller.lowSpaceMessage(ClientInstaller.availableSpace(ClientInstallService.cache()));
+            if (warning!=null) {
+                new AlertDialog.Builder(this).setTitle("存储空间不足").setMessage(warning)
+                    .setPositiveButton("知道了",null).show();
+                return;
+            }
+            autoConsumed=false; ContextCompat.startForegroundService(this,intent);
+        }
         updateStatus();
     }
     private void onPlay() {

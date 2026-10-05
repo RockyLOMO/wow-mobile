@@ -17,6 +17,11 @@ public final class ClientInstallerTest {
     private static final ClientInstaller.ReadyCheck READY = dir -> new File(dir,"Wow.exe").length()>0;
     public static void main(String[] args) throws Exception {
         Path root=Files.createTempDirectory(Paths.get(args[0]),"installer-test-");
+        require(ClientInstaller.lowSpaceMessage(19_999_999_999L)!=null,"below 20GB rejected");
+        require(ClientInstaller.lowSpaceMessage(20_000_000_000L)==null,"20GB minimum boundary");
+        require(ClientInstaller.lowSpaceMessage(0).contains("45 GB"),"low space explains download plus extraction");
+        long available=ClientInstaller.availableSpace(root.resolve("missing/a/cache").toFile());
+        require(available>0 && Math.abs(available-root.toFile().getUsableSpace())<16*1024*1024L,"missing cache checks existing storage parent");
         byte[] payload=new byte[4*1024*1024];new Random(335).nextBytes(payload);
         body=zip("WoW-3.3.5a-zhCN/Wow.exe",payload);
         HttpServer server=HttpServer.create(new InetSocketAddress("127.0.0.1",0),0);
@@ -38,6 +43,11 @@ public final class ClientInstallerTest {
         server.start();
         String url="http://127.0.0.1:"+server.getAddress().getPort()+"/client.zip";
         try {
+            File lowSpace = new File(root.resolve("low-space").toString()) {
+                @Override public long getUsableSpace() { return 1; }
+            };
+            expectFailure(()->ClientInstaller.download(url,lowSpace,new AtomicBoolean(),(p,d,t,x)->{}));
+            require(!new File(lowSpace,"client.zip.part").exists(),"dynamic space check prevents download file creation");
             File cache=root.resolve("cache").toFile(), destination=root.resolve("client").toFile();
             AtomicBoolean pause=new AtomicBoolean();
             try {ClientInstaller.install(url,cache,destination,pause,(phase,done,total,detail)-> {if(phase.equals("download")&&done>0)pause.set(true);},READY);throw new AssertionError("pause ignored");}
@@ -81,7 +91,7 @@ public final class ClientInstallerTest {
             expectFailure(()->ClientInstaller.install(url,corruptCache,root.resolve("bad-client").toFile(),pause,(p,d,t,x)->{},READY));
             require(!new File(corruptCache,"client.zip").exists(),"invalid directory invalidates cache");
             require(!ClientInstaller.isClientReady(destination),"small fixture not mistaken for real client");
-            System.out.println("PASS: Range resume, 200 restart, ETag change, CRC rejection/retry, safe paths, wrapper publish and user data preservation");
+            System.out.println("PASS: 20GB boundary, missing cache storage, insufficient space blocks transfer, Range resume, 200 restart, ETag change, CRC rejection/retry, safe paths, wrapper publish and user data preservation");
         } finally {server.stop(0);}
     }
     private static byte[] zip(String name,byte[] data)throws IOException {

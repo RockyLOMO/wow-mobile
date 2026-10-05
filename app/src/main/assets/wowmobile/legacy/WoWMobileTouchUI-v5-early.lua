@@ -1,4 +1,4 @@
--- WoW Mobile Touch UI v6 (Old Dream, adaptive width / 720p)
+-- WoW Mobile Touch UI v5 (Old Dream, adaptive width / 720p)
 local frame = CreateFrame("Frame")
 local dirty, applying = true, false
 frame:RegisterEvent("PLAYER_LOGIN")
@@ -23,7 +23,7 @@ local function updateLayout()
         if bar and first then
             local width, height = first:GetWidth(), first:GetHeight()
             local gap = 6
-            bar:SetScale(1.30)
+            bar:SetScale(1.20)
             -- WoW 3.3.5 renders its 768-high UI canvas into the configured viewport.
             local renderHeight = tonumber((GetCVar("gxResolution") or ""):match("x(%d+)")) or 720
             local canvasScale = renderHeight / (UIParent:GetHeight() * UIParent:GetEffectiveScale())
@@ -74,7 +74,7 @@ frame:SetScript("OnEvent", function(_, event)
         local reload = false
         for i = 1, GetNumAddOns() do
             local name, _, _, enabled = GetAddOnInfo(i)
-            if name and name:match("^ConsolePort") and (enabled == true or enabled == 1) then
+            if name and name:match("^ConsolePort") and enabled then
                 DisableAddOn(name)
                 reload = true
             end
