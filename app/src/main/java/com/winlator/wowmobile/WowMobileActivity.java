@@ -157,7 +157,7 @@ public class WowMobileActivity extends AppCompatActivity {
             return;
         }
         if (state.running || "paused".equals(state.phase) || "error".equals(state.phase)) {
-            status.setText(state.running ? ("extract".equals(state.phase) ? "正在解压客户端" : "正在下载客户端") : "paused".equals(state.phase) ? "安装已暂停" : "安装未完成");
+            status.setText(state.running ? ("extract".equals(state.phase) ? "正在解压客户端" : "verify".equals(state.phase) ? "正在校验客户端" : "正在下载客户端") : "paused".equals(state.phase) ? "安装已暂停" : "安装未完成");
             String rate=state.bytesPerSecond>0 ? String.format(Locale.CHINA," · %.1f MB/s · 约 %d 分钟",state.bytesPerSecond/1e6,(state.total-state.done)/state.bytesPerSecond/60) : "";
             detail.setText(String.format(Locale.CHINA,"%.1f%% · %.2f / %.2f GB%s\n%s",state.total>0 ? state.done*100.0/state.total:0,state.done/1e9,state.total/1e9,rate,state.detail));
             download.setText(state.running ? "暂停安装" : "继续安装");

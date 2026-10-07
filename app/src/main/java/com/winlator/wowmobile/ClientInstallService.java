@@ -64,7 +64,7 @@ public final class ClientInstallService extends Service {
         new Thread(() -> {
             Snapshot terminal;
             try {
-                ClientInstaller.install(ClientInstaller.URL, cache(), destination(), paused, this::progress, ClientInstaller::isClientReady);
+                ClientInstaller.installParts(ClientInstaller.URL, cache(), destination(), paused, this::progress, ClientInstaller::isClientReady);
                 PreferenceManager.getDefaultSharedPreferences(this).edit()
                     .putString(WowMobileActivity.PREF_GAME_FOLDER, destination().getPath()).commit();
                 terminal = new Snapshot("complete", "客户端已就绪", 1, 1, 0, false);
@@ -108,7 +108,7 @@ public final class ClientInstallService extends Service {
         PendingIntent content = PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         PendingIntent pause = PendingIntent.getService(this, 1, new Intent(this, ClientInstallService.class).setAction(PAUSE), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         return new Notification.Builder(this, CHANNEL).setSmallIcon(android.R.drawable.stat_sys_download)
-            .setContentTitle("旧梦WOW · " + ("extract".equals(state.phase) ? "解压客户端" : "下载客户端"))
+            .setContentTitle("旧梦WOW · " + ("extract".equals(state.phase) ? "解压客户端" : "verify".equals(state.phase) ? "校验客户端" : "下载客户端"))
             .setContentText(state.total > 0 ? state.percent() + "% · " + state.detail : state.detail)
             .setContentIntent(content).setOnlyAlertOnce(true).setOngoing(true)
             .setProgress(100, state.percent(), state.total <= 0)
