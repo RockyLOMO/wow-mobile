@@ -1,3 +1,5 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 # 旧梦WOW v8：S10 完整安装验证、下载限速与触控布局
 
 ## 发布约定

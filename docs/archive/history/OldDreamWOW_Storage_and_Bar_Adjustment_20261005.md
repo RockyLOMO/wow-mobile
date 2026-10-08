@@ -1,3 +1,5 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 # 旧梦WOW v9：容量检查、后台授权与右侧触控微调
 
 ## 下载前容量检查
@@ -35,19 +37,19 @@
 
 游戏内布局与触控截图：
 
-![S10动作条旁的目标与跳跃](OldDreamWOW_S10_adjacent_buttons_v9.png)
+![S10动作条旁的目标与跳跃](../../assets/screenshots/OldDreamWOW_S10_adjacent_buttons_v9.png)
 
-![右侧技能长按命中](OldDreamWOW_S10_right_skill_v9.png)
+![右侧技能长按命中](../../assets/screenshots/OldDreamWOW_S10_right_skill_v9.png)
 
-![新位置跳跃](OldDreamWOW_S10_jump_v9.png)
+![新位置跳跃](../../assets/screenshots/OldDreamWOW_S10_jump_v9.png)
 
 首次提示与系统授权截图：
 
-![首次后台运行提示](OldDreamWOW_S10_background_prompt_v9.png)
+![首次后台运行提示](../../assets/screenshots/OldDreamWOW_S10_background_prompt_v9.png)
 
-![一键打开系统授权](OldDreamWOW_S10_background_permission_v9.png)
+![一键打开系统授权](../../assets/screenshots/OldDreamWOW_S10_background_permission_v9.png)
 
-![授权后的启动页状态](OldDreamWOW_S10_background_allowed_v9.png)
+![授权后的启动页状态](../../assets/screenshots/OldDreamWOW_S10_background_allowed_v9.png)
 
 收尾：已关闭旧梦WOW、Wow.exe和Wine进程，无安装服务残留；媒体音量0、充电常亮关闭、屏幕Dozing。原`WoW335CN/Wow.exe`保留，工作资料用户10未安装应用。
 

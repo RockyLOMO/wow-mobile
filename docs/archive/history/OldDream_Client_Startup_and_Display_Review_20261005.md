@@ -1,3 +1,5 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 > 更新：本文件前期固定宽1280方案已被用户最新要求替代。当前实现固定高720、按屏幕比例算宽，S10为1520×720，名称旧梦WOW。详见 [最新实现](OldDreamWOW_Bootstrap_and_720p_20261005.md)。
 
 # 旧梦：屏幕显示和客户端自动准备流程复核

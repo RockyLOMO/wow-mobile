@@ -1,3 +1,5 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 # 旧梦WOW v10：Play后的加载宣传页、技能误触保留目标
 
 本文保留v10加载页的历史验收。当前v11已移除“预计启动进度”字样，改为底部mm:ss计时、上次成功耗时曲线和超过120秒的手动入口，见[最新启动页说明](OldDreamWOW_Startup_History_20261005.md)。下方APK哈希仅对应v10历史版本；固定下载地址现在提供最新版本。
@@ -32,33 +34,33 @@
 - 改选宠物后再点击空地，目标保持为宠物；没有反复强制切回先前目标。右侧技能的外延命中区域(1494,274)长按触发“治疗宠物”，法力501→473，治疗增益出现；图标和目标/跳跃位置保持。测试未进入战斗、未换机型。
 - 最后从登录页退出，再停止App。ADB确认App/WoW/Wine运行进程不存在，媒体音量0，充电常亮设置0，熄屏（`mWakefulness=Dozing`，系统待机显示状态）。
 
-![最终版：底部预计进度](OldDreamWOW_S10_progress_v10.png)
+![最终版：底部预计进度](../../assets/screenshots/OldDreamWOW_S10_progress_v10.png)
 
-![最终版：35秒缓慢增长至80.56%](OldDreamWOW_S10_progress_slow_v10.png)
+![最终版：35秒缓慢增长至80.56%](../../assets/screenshots/OldDreamWOW_S10_progress_slow_v10.png)
 
-![最终版：约48秒自动进入登录画面](OldDreamWOW_S10_progress_finished_v10.png)
+![最终版：约48秒自动进入登录画面](../../assets/screenshots/OldDreamWOW_S10_progress_finished_v10.png)
 
 以下加载截图为百分比改动前初版的慢启动验证：
 
-![Play后的宣传加载页](OldDreamWOW_S10_loading_v10.png)
+![Play后的宣传加载页](../../assets/screenshots/OldDreamWOW_S10_loading_v10.png)
 
-![模拟慢启动超过60秒](OldDreamWOW_S10_loading_slow_v10.png)
+![模拟慢启动超过60秒](../../assets/screenshots/OldDreamWOW_S10_loading_slow_v10.png)
 
-![画面出现后自动收起](OldDreamWOW_S10_loading_finished_v10.png)
+![画面出现后自动收起](../../assets/screenshots/OldDreamWOW_S10_loading_finished_v10.png)
 
-![连续误触后目标仍保留](OldDreamWOW_S10_target_kept_v10.png)
+![连续误触后目标仍保留](../../assets/screenshots/OldDreamWOW_S10_target_kept_v10.png)
 
-![技能格间扩展区域命中治疗宠物](OldDreamWOW_S10_skill_gap_v10.png)
+![技能格间扩展区域命中治疗宠物](../../assets/screenshots/OldDreamWOW_S10_skill_gap_v10.png)
 
-![改选宠物后点击空地仍保留](OldDreamWOW_S10_target_switched_v10.png)
+![改选宠物后点击空地仍保留](../../assets/screenshots/OldDreamWOW_S10_target_switched_v10.png)
 
-![Esc主动清除仍有效](OldDreamWOW_S10_target_clear_v10.png)
+![Esc主动清除仍有效](../../assets/screenshots/OldDreamWOW_S10_target_clear_v10.png)
 
 ## APK发布
 
 - 固定地址：[OldDreamWOW.apk](https://cloud.f-li.cn:6500/wow/OldDreamWOW.apk)。发布到`E:\rxdev\webhost\wow\OldDreamWOW.apk`，本机副本`docs/OldDreamWOW.apk`。
 - 文件大小170,972,974字节，SHA-256：`B741BAAC7DA38BD36BCBA34F2D333A9B155B1AB9445720D71E8D75F600FC3FF5`。构建、docs副本、固定发布文件及HTTP完整下载的哈希一致。
-- 新设备自动/手动项见[安装设置清单](OldDreamWOW_New_Device_Setup_Checklist.md)。
+- 新设备自动/手动项见[安装设置清单](../../OldDreamWOW_New_Device_Setup_Checklist.md)。
 
 ## 参考实现依据
 

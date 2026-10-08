@@ -1,8 +1,10 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 # WoW Mobile / Winlator：改成“手游式直接点击技能”触控布局
 
 ## S10 当前已配置（2026-10-02）
 
-手机 **WoW Mobile v0.1.2** 已导入 [S10 实际触控配置](WoW-Mobile-S10-Touch-Skills.icp)。从 WoW Mobile 首页点 **Play** 后，已看到新布局自动加载：左侧 WASD 方向键，右侧两行 `1`～`6`，底部有跳跃、选怪、`F互动`、鼠标左/右键，顶部有菜单、背包、镜头和地图。原布局已另存为 [备份](WoW-Mobile-S10-Original-ConsolePortLK.icp)，手机里也保留 `WoW ConsolePortLK Backup`。
+手机 **WoW Mobile v0.1.2** 已导入 [S10 实际触控配置](../../assets/touch/WoW-Mobile-S10-Touch-Skills.icp)。从 WoW Mobile 首页点 **Play** 后，已看到新布局自动加载：左侧 WASD 方向键，右侧两行 `1`～`6`，底部有跳跃、选怪、`F互动`、鼠标左/右键，顶部有菜单、背包、镜头和地图。原布局已另存为 [备份](../../assets/touch/WoW-Mobile-S10-Original-ConsolePortLK.icp)，手机里也保留 `WoW ConsolePortLK Backup`。
 
 配置对应的按键：技能 `1`～`6`、选怪 `TAB`、跳跃 `SPACE`、互动 `F`、背包 `B`、地图 `M`、菜单 `ESC`。WoW Mobile 已在该账号的 `bindings-cache.wtf` 写入 `bind F INTERACTTARGET`。2026-10-02 手机成功进入 `Firstkiller` 的游戏世界，服务端数据库显示角色在线；方向键按住后场景移动，按技能 `1` 后游戏出现“没有目标”提示，证明这两个输入已传到客户端。其他数字键、选怪、互动/拾取、镜头拖动仍未逐项实战验收。
 

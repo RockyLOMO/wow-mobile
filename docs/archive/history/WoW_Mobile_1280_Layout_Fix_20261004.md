@@ -1,3 +1,5 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 # S10：1280 分辨率布局和触点修复（2026-10-04 v5）
 
 ## 当前设置
@@ -20,10 +22,10 @@
 - 进入 Firstkiller 游戏世界后，技能栏两端、背包窗口和物品格完整显示。长按底部两个有技能的图标，游戏记录 `ActionButton5 RightButton`、`ActionButton7 RightButton`；对应 `GetMouseFocus()` 为 ActionButton5/7。背包格长按后焦点为 `CombuctorItem41`，没有落在标题上。
 - 点击登录、进入世界均成功；镜头快速拖动仍可使用。未做所有分辨率的实机逐项验证或长时间性能测试。
 
-[旧版裁切画面](WoW_Native_Touch_S10_layout_before_v5.png) · [修复后布局与图标命中证据](WoW_Native_Touch_S10_layout_v5.png)
+[旧版裁切画面](../../assets/screenshots/WoW_Native_Touch_S10_layout_before_v5.png) · [修复后布局与图标命中证据](../../assets/screenshots/WoW_Native_Touch_S10_layout_v5.png)
 
-本机 APK：[v5 Debug](WoW_Mobile_Native_Touch_debug_20261004_v5.apk)。只安装到 main profile，APK 不随源码提交。
+本机 APK：[v5 Debug](../apk/WoW_Mobile_Native_Touch_debug_20261004_v5.apk)。只安装到 main profile，APK 不随源码提交。
 
 源码提交 `a97b3a3`，已推送 fork 的 `feature/wow-native-touch` 分支。APK SHA-256：`012F8C3ADCE669B64359E336BD4AB771175A82569250160B9C28A4BA8A8B33F5`。
 
-最终 APK 再次安装后，从 Play 启动直接铺满 S10 横屏，[自动全屏截图](WoW_Native_Touch_S10_fullscreen_v5.png)。设置页当前选项为 1280×1024，列表无宽度小于 1280 的选项。收尾关闭游戏与应用，`ps -A` 无 WoW/Wine/应用进程，媒体音量为 0，USB 常亮为 0，手机已熄屏；main profile 有包，work profile 无包。
+最终 APK 再次安装后，从 Play 启动直接铺满 S10 横屏，[自动全屏截图](../../assets/screenshots/WoW_Native_Touch_S10_fullscreen_v5.png)。设置页当前选项为 1280×1024，列表无宽度小于 1280 的选项。收尾关闭游戏与应用，`ps -A` 无 WoW/Wine/应用进程，媒体音量为 0，USB 常亮为 0，手机已熄屏；main profile 有包，work profile 无包。

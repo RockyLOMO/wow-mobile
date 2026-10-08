@@ -76,4 +76,4 @@
 
 本清单已按当前`WowMobileActivity`、`WowContainerHelper`、`Provisioner`、`WoWMobileTouchUI` v7、触控配置资产及发布客户端ZIP目录核对。S10实机验证加载页、目标保留、技能扩展点击区及登录；“另一台全新设备整套安装”本次未实机执行，其他GPU/屏幕比例的结果不作为已验证事实。
 
-下载：[最新固定APK](https://cloud.f-li.cn:6500/wow/OldDreamWOW.apk)。详细实机证据见[加载与目标保护验收](OldDreamWOW_Loading_and_Target_Guard_20261005.md)和[启动耗时记忆与计时](OldDreamWOW_Startup_History_20261005.md)。
+下载：[最新固定APK](https://cloud.f-li.cn:6500/wow/OldDreamWOW.apk)。详细实机证据见[加载与目标保护验收](archive/history/OldDreamWOW_Loading_and_Target_Guard_20261005.md)和[启动耗时记忆与计时](archive/history/OldDreamWOW_Startup_History_20261005.md)。

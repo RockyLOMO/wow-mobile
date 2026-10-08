@@ -1,3 +1,5 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 # 旧梦WOW：自动启动、客户端安装与 720 高度适配
 
 本文为v7阶段记录。后续完整20GB实机下载/解压、首次启动及v8布局结果见[完整安装与触控验收](OldDreamWOW_Full_Install_and_Touch_20261005.md)。

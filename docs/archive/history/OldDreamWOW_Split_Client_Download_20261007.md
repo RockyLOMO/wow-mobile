@@ -1,3 +1,5 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 # 旧梦WOW v12：六分片客户端下载
 
 ## 源文件与实现
@@ -24,13 +26,13 @@
 - 实机全链路使用本机原有`/sdcard/WoW335CN`以外的空目标目录；验收后恢复原客户端选择，并清理本次新建的测试客户端副本，避免多占约20GB。原客户端及账号文件未被覆盖。
 - 恢复后再次自动启动原客户端，`49270ms; realFrame=true`进入原登录界面，原账号名仍在；仅验证到登录页，没有进入角色。最后媒体音量0、充电常亮0、熄屏待机（Dozing），App/WoW/Wine运行进程不存在；测试客户端已删除，安装缓存为空，可用空间回到67GiB。
 
-![S10进程重启后续传第二片](OldDreamWOW_S10_split_resume_20261007.png)
+![S10进程重启后续传第二片](../../assets/screenshots/OldDreamWOW_S10_split_resume_20261007.png)
 
-![六片校验后自动解压](OldDreamWOW_S10_split_extract_20261007.png)
+![六片校验后自动解压](../../assets/screenshots/OldDreamWOW_S10_split_extract_20261007.png)
 
-![安装完成后自动显示游戏加载页](OldDreamWOW_S10_split_auto_loading_20261007.png)
+![安装完成后自动显示游戏加载页](../../assets/screenshots/OldDreamWOW_S10_split_auto_loading_20261007.png)
 
-![新下载客户端自动进入登录界面](OldDreamWOW_S10_split_auto_login_20261007.png)
+![新下载客户端自动进入登录界面](../../assets/screenshots/OldDreamWOW_S10_split_auto_login_20261007.png)
 
 ## APK发布
 

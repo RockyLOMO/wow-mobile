@@ -1,3 +1,5 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 # 旧梦WOW v11：启动计时与上次成功耗时
 
 ## 当前界面
@@ -26,19 +28,19 @@
 - 最后一次正常启动仍读取`previousDurationMs=47052`，截图`00:22 / 42.21%`；`47637ms; realFrame=true`自动进入登录页，成功记录更新为47635。验证没有受到人工暂停测试污染。
 - 收尾ADB确认媒体音量0、充电常亮设置0、`mWakefulness=Dozing`（熄屏待机显示状态）；App/WoW/Wine运行进程不存在。
 
-![底部分钟计时和30–120秒提示](OldDreamWOW_S10_startup_timer_v11.png)
+![底部分钟计时和30–120秒提示](../../assets/screenshots/OldDreamWOW_S10_startup_timer_v11.png)
 
-![两分钟之前不显示查看按钮](OldDreamWOW_S10_startup_before_timeout_v11.png)
+![两分钟之前不显示查看按钮](../../assets/screenshots/OldDreamWOW_S10_startup_before_timeout_v11.png)
 
-![超过两分钟后显示查看按钮](OldDreamWOW_S10_startup_after_timeout_v11.png)
+![超过两分钟后显示查看按钮](../../assets/screenshots/OldDreamWOW_S10_startup_after_timeout_v11.png)
 
-![正常重启沿用上一轮真实耗时](OldDreamWOW_S10_startup_history_v11.png)
+![正常重启沿用上一轮真实耗时](../../assets/screenshots/OldDreamWOW_S10_startup_history_v11.png)
 
-![约48秒自动进入登录画面](OldDreamWOW_S10_startup_finished_v11.png)
+![约48秒自动进入登录画面](../../assets/screenshots/OldDreamWOW_S10_startup_finished_v11.png)
 
 ## APK发布
 
 - 固定下载：[OldDreamWOW.apk](https://cloud.f-li.cn:6500/wow/OldDreamWOW.apk)。固定发布文件`E:\rxdev\webhost\wow\OldDreamWOW.apk`，本机副本`docs/OldDreamWOW.apk`。
 - 大小170,972,966字节，SHA-256：`E7485D281D3CD24C4D0FC5E10AF66036B6254E607BAC7479F64AEB9C563D7C6B`。构建、本机副本、发布文件、HTTP完整下载四份哈希一致。
 
-新设备自动/手动项见[安装设置清单](OldDreamWOW_New_Device_Setup_Checklist.md)。
+新设备自动/手动项见[安装设置清单](../../OldDreamWOW_New_Device_Setup_Checklist.md)。

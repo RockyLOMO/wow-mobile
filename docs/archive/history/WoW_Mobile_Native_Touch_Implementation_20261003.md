@@ -1,3 +1,5 @@
+> 历史阶段记录：仅保留当时的设计与验证结果。现行功能以[安装使用手册](../../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../../OldDreamWOW_Development_Guide.md)为准。文中的旧下载地址、APK哈希、分辨率和未完成状态不代表当前版本。
+
 # WoW Mobile Native Touch 实现与 S10 测试清单
 
 ## 代码与产物
@@ -41,7 +43,7 @@ Java 编译及 Debug APK 构建均显示 `BUILD SUCCESSFUL`。APK 的包名为 `
 
 ## 2026-10-04 游戏内复核与收尾
 
-在 Galaxy S10 登录并进入角色后，未输入缩放命令，技能栏已自动显示约 1.35 倍大小；摇杆上移后不再覆盖技能栏。[实机画面](WoW_Native_Touch_S10_after_v2.png)。ADB 快速滑动 165 px / 240 ms，场景明显旋转；在角色头像上按住 520 ms 后松手，右键菜单弹出。登录页按钮也已单击命中。ADB 无法可靠注入双指与摇杆加右手的同时操作，相关项目保留手测状态。
+在 Galaxy S10 登录并进入角色后，未输入缩放命令，技能栏已自动显示约 1.35 倍大小；摇杆上移后不再覆盖技能栏。[实机画面](../../assets/screenshots/WoW_Native_Touch_S10_after_v2.png)。ADB 快速滑动 165 px / 240 ms，场景明显旋转；在角色头像上按住 520 ms 后松手，右键菜单弹出。登录页按钮也已单击命中。ADB 无法可靠注入双指与摇杆加右手的同时操作，相关项目保留手测状态。
 
 游戏通过 `/quit` 正常退出后，执行 `adb shell am force-stop it.wowmobile`。随后 `adb shell ps -A` 未找到 `Wow.exe`、`it.wowmobile`、`box64`、Wine 或 XServer 进程；`stay_on_while_plugged_in` 为 `0`，手机屏幕为 Dozing。`cmd media_session volume --stream 3 --get` 返回 `volume is 0 in range [0..15]`，游戏媒体音量保持静音。
 
@@ -49,7 +51,7 @@ Java 编译及 Debug APK 构建均显示 `BUILD SUCCESSFUL`。APK 的包名为 `
 
 - Galaxy S10 的 Android 用户 0（主资料）与用户 10（工作资料）原本都安装了 `it.wowmobile`，工作资料标记为从未启动。执行 `adb shell pm uninstall --user 10 it.wowmobile` 返回 `Success`。复核用户 0 仍安装、用户 10 不再安装。Android 多用户共用 APK 代码文件，因此释放的主要是工作资料专属数据与桌面入口，不能把整个 APK 体积算作节省空间。
 - 旧插件进游戏后，先通过 `/run` 对比整体缩放 1.12、技能栏补偿缩放、聊天字号 14。v3 将配置写入 `WoWMobileTouchUI.lua`，新版 APK 安装到用户 0 后，手机上的旧版 Lua 自动升级为 v2；未改动用户账户与 BigFoot 文件。
-- 退出游戏后检查到 `gxResolution` 实际保存为 `800x600`。这会渲染 480,000 像素，且在 S10 宽屏里让界面过大、技能栏两侧裁切；`960x432` 渲染 414,720 像素，少 13.6%。将 `WTF/Config.wtf` 改为 `960x432` 后重新登录验证，实际世界画面铺满屏幕，文字较清晰，技能栏可见。[实机画面](WoW_Native_Touch_S10_font_v3.png)。登录与加载画面可能短暂留有黑边，进入世界后铺满。
+- 退出游戏后检查到 `gxResolution` 实际保存为 `800x600`。这会渲染 480,000 像素，且在 S10 宽屏里让界面过大、技能栏两侧裁切；`960x432` 渲染 414,720 像素，少 13.6%。将 `WTF/Config.wtf` 改为 `960x432` 后重新登录验证，实际世界画面铺满屏幕，文字较清晰，技能栏可见。[实机画面](../../assets/screenshots/WoW_Native_Touch_S10_font_v3.png)。登录与加载画面可能短暂留有黑边，进入世界后铺满。
 - 本机账号 `WTF/Account/WOWADMIN/config-cache.wtf` 的 `SET autoLootDefault "1"` 已在游戏正常退出后核实；v3 的新安装默认配置也加入这一项。点击附近尸体后尸体消失，未弹出需要逐项点击的拾取窗；未单独核实掉落物清单。
 - BigFoot 账号设置已开启 `EnableRepairHelper=1`、`AutoRepairDurability=1`，即商人可修理时自动修理身上装备；`RepairHelper_RepairAll=0` 维持原设置。`SellerHelper.AutoSellPoor=1`（自动卖灰色物品）、商人/银行/交易时自动开包、`QuickLoot.EnableQuickLoot=1` 也已开启。没有额外打开自动交任务等可能误操作的功能。自动修理和自动出售仅核对配置，未实测商人交易。
 - 执行 `:app:assembleDebug` 显示 `BUILD SUCCESSFUL`，`adb install --user 0 -r` 显示 `Success`。安装后自动升级的 Lua 首行是 `-- WoW Mobile Touch UI v2`。收尾执行 `am force-stop it.wowmobile`、`svc power stayon false`、熄屏；`ps -A` 无 WoW、应用或 Wine 进程，`stay_on_while_plugged_in=0`。用户 0 仍有包，用户 10 无包；分辨率和自动拾取配置仍为 `960x432` 与 `1`。
@@ -58,7 +60,7 @@ Java 编译及 Debug APK 构建均显示 `BUILD SUCCESSFUL`。APK 的包名为 `
 
 此前方向键发送 W/A/S/D，但 A/D 沿用了 WoW 的转向绑定，导致左右方向键转动角色与镜头。`Provisioner.patchBindingsCache` 现在按输入模式写入 A/D：Native Touch 使用 `STRAFELEFT` / `STRAFERIGHT`，Legacy 使用 `TURNLEFT` / `TURNRIGHT`。每次从 Play 启动会重新应用，因此已有手机账号也能更新；其余按键沿用原配置。此轮实测账号使用账号级绑定（`GetCurrentBindingSet()=1`）。自定义角色级绑定尚未覆盖验证。
 
-在 S10 当前游戏中设置并保存横移绑定后，分别按住方向盘右、左区域 700 ms，场景随人物位移，角色朝向 `GetPlayerFacing()` 始终为 `1.2462794780731`；聊天输出分别为 `STRAFERIGHT`、`STRAFELEFT`。[左右横移验证截图](WoW_Native_Touch_S10_strafe_v4.png)。构建 `:app:assembleDebug` 返回 `BUILD SUCCESSFUL`，安装 `adb install --user 0 -r` 返回 `Success`。新版再次点击 Play 后，账号配置仍是 `bind A STRAFELEFT`、`bind D STRAFERIGHT`。
+在 S10 当前游戏中设置并保存横移绑定后，分别按住方向盘右、左区域 700 ms，场景随人物位移，角色朝向 `GetPlayerFacing()` 始终为 `1.2462794780731`；聊天输出分别为 `STRAFERIGHT`、`STRAFELEFT`。[左右横移验证截图](../../assets/screenshots/WoW_Native_Touch_S10_strafe_v4.png)。构建 `:app:assembleDebug` 返回 `BUILD SUCCESSFUL`，安装 `adb install --user 0 -r` 返回 `Success`。新版再次点击 Play 后，账号配置仍是 `bind A STRAFELEFT`、`bind D STRAFERIGHT`。
 
 收尾关闭客户端，`ps -A` 无 WoW、应用、Wine 或 box64 进程；媒体音量为 0，USB 常亮为 0，手机已熄屏。
 
