@@ -1,19 +1,39 @@
-# WoW Mobile 本机资料
+# 旧梦WOW 文档
 
-- [原生触控技术方案](archive/history/WoW_Mobile_Native_Touch_Technical_Plan.md)
-- [原生触控实现与 Galaxy S10 验证](archive/history/WoW_Mobile_Native_Touch_Implementation_20261003.md)
-- [S10 触控技能布局与使用说明](archive/history/WoW_Mobile_Touch_Skill_Layout.md)
-- [1280 分辨率布局与触点修复](archive/history/WoW_Mobile_1280_Layout_Fix_20261004.md)
-- [旧梦：屏幕显示与自动准备客户端流程复核](archive/history/OldDream_Client_Startup_and_Display_Review_20261005.md)
-- [旧梦WOW：启动下载及720高度适配实现与验证](archive/history/OldDreamWOW_Bootstrap_and_720p_20261005.md)
-- [v8：S10完整20GB安装验收、LAN下载策略与右侧技能布局](archive/history/OldDreamWOW_Full_Install_and_Touch_20261005.md)
-- [v9：下载前容量检查、一键后台授权与技能/目标/跳跃微调](archive/history/OldDreamWOW_Storage_and_Bar_Adjustment_20261005.md)
-- [v10：Play后的宣传加载页、技能误触保留目标](archive/history/OldDreamWOW_Loading_and_Target_Guard_20261005.md)
-- [v11：启动计时、记忆上次成功耗时、120秒手动入口](archive/history/OldDreamWOW_Startup_History_20261005.md)
-- [v12：六分片客户端下载、续传和SHA-256校验](archive/history/OldDreamWOW_Split_Client_Download_20261007.md)
-- [新设备安装：APK自动设置与手动设置清单](OldDreamWOW_New_Device_Setup_Checklist.md)
-- [最新本机 Debug APK：旧梦WOW](OldDreamWOW.apk)；公共发布固定为`E:\rxdev\webhost\wow\OldDreamWOW.apk`，[手机下载](https://cloud.f-li.cn:6500/wow/OldDreamWOW.apk)。
-- [应用图标原图](assets/brand/OldDreamWOW_App_Icon_20261005.png)
-- [实际触控配置](assets/touch/WoW-Mobile-S10-Touch-Skills.icp)与[原始布局备份](assets/touch/WoW-Mobile-S10-Original-ConsolePortLK.icp)
+整理日期：2026-10-08。现行功能依据2026-10-07六分片下载版本（阶段v12）；APK版本为`0.1.2 / versionCode 3`，触控Lua插件为v7。本次整理没有重新执行实机验收。
 
-同目录保留 S10 验证截图和较早的 Debug APK。APK 是本机生成的测试产物，在此仓库中已忽略，不会随源码提交。
+## 从这里开始
+
+| 需要了解 | 文档 |
+| --- | --- |
+| 安装、客户端下载、触控操作、换手机后哪些设置自动继承 | [安装与使用手册](OldDreamWOW_New_Device_Setup_Checklist.md) |
+| 模块边界、续传、安全解压、界面规则、构建发布及验证范围 | [开发维护手册](OldDreamWOW_Development_Guide.md) |
+| 原始方案、阶段修改、S10验收与截图 | [历史资料索引](archive/README.md) |
+
+当前默认原生触控，高720并按屏幕比例计算宽度；左右按钮为人物横移，右侧动作栏与文字放大，点击空地保留目标。缺少客户端时提供六片下载、续传、校验和自动解压，完成后自动启动；Play后的宣传加载页显示真实计时和按历史耗时推进的百分比。
+
+## APK与资源
+
+- [手机下载最新固定APK](https://cloud.f-li.cn:6500/wow/OldDreamWOW.apk)；[本机APK副本](OldDreamWOW.apk)。发布位置：`E:\rxdev\webhost\wow\OldDreamWOW.apk`。
+- [应用图标原图](assets/brand/OldDreamWOW_App_Icon_20261005.png)。
+- [S10触控配置](assets/touch/WoW-Mobile-S10-Touch-Skills.icp)与[原始ConsolePort布局备份](assets/touch/WoW-Mobile-S10-Original-ConsolePortLK.icp)。新安装自动建立配置，通常不需导入。
+
+本次核对本机APK大小：170,978,473字节；SHA-256：`54ABF2BA08B3F80CBD3D6BF003ED8C3DF86F4DBEA3CDC1104FCB9DE69B8E248A`。后续发布重新核对。APK不包含约20GB客户端，APK产物不提交Git。
+
+## 目录约定
+
+```text
+docs/
+  README.md                               文档入口
+  OldDreamWOW_New_Device_Setup_Checklist.md 安装与使用手册
+  OldDreamWOW_Development_Guide.md          开发维护手册
+  OldDreamWOW.apk                          当前本机APK
+  assets/brand/                           图标资源
+  assets/screenshots/                     历史实机截图
+  assets/touch/                           触控配置与备份
+  archive/README.md                       历史索引
+  archive/history/                        原始阶段文档
+  archive/apk/                            本机旧APK
+```
+
+日常操作和现行规则统一维护两份主手册；新增阶段验收记录放入归档并补充历史索引。历史文档中的旧分辨率、下载地址、APK哈希和待办状态只代表当时版本。

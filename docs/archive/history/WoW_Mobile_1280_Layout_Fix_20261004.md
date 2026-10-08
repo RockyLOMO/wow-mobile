@@ -24,7 +24,7 @@
 
 [旧版裁切画面](../../assets/screenshots/WoW_Native_Touch_S10_layout_before_v5.png) · [修复后布局与图标命中证据](../../assets/screenshots/WoW_Native_Touch_S10_layout_v5.png)
 
-本机 APK：[v5 Debug](../apk/WoW_Mobile_Native_Touch_debug_20261004_v5.apk)。只安装到 main profile，APK 不随源码提交。
+当时产物为v5 Debug APK，当前本机已不保留该文件；最新版本见[文档首页](../../README.md)。只安装到 main profile，APK 不随源码提交。
 
 源码提交 `a97b3a3`，已推送 fork 的 `feature/wow-native-touch` 分支。APK SHA-256：`012F8C3ADCE669B64359E336BD4AB771175A82569250160B9C28A4BA8A8B33F5`。
 
