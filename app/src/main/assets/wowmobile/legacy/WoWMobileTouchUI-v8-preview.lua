@@ -72,20 +72,6 @@ local function updateLayout()
     dirty = false
 end
 frame:SetScript("OnEvent", function(_, event)
-    if event == "PLAYER_LOGIN" and WoWMobileNativeTouch == false then
-        local reload = false
-        -- Restore the two essential controller addons when Legacy is explicitly selected.
-        for _, name in ipairs({"ConsolePort", "ConsolePortBar"}) do
-            if GetAddOnInfo(name) and not IsAddOnLoaded(name) then
-                local _, _, _, enabled = GetAddOnInfo(name)
-                if enabled ~= true and enabled ~= 1 then
-                    EnableAddOn(name)
-                    reload = true
-                end
-            end
-        end
-        if reload then ReloadUI(); return end
-    end
     if event == "PLAYER_LOGIN" and WoWMobileNativeTouch ~= false then
         -- A missed skill tap landing on the ground must not clear the current target.
         SetCVar("deselectOnClick", "0")

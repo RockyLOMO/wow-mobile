@@ -1,4 +1,4 @@
--- WoW Mobile Touch UI v8 (Old Dream, native mode / loaded addon cleanup)
+-- WoW Mobile Touch UI v7 (Old Dream, adaptive width / 720p)
 local frame = CreateFrame("Frame")
 local dirty, applying = true, false
 frame:RegisterEvent("PLAYER_LOGIN")
@@ -72,30 +72,15 @@ local function updateLayout()
     dirty = false
 end
 frame:SetScript("OnEvent", function(_, event)
-    if event == "PLAYER_LOGIN" and WoWMobileNativeTouch == false then
-        local reload = false
-        -- Restore the two essential controller addons when Legacy is explicitly selected.
-        for _, name in ipairs({"ConsolePort", "ConsolePortBar"}) do
-            if GetAddOnInfo(name) and not IsAddOnLoaded(name) then
-                local _, _, _, enabled = GetAddOnInfo(name)
-                if enabled ~= true and enabled ~= 1 then
-                    EnableAddOn(name)
-                    reload = true
-                end
-            end
-        end
-        if reload then ReloadUI(); return end
-    end
     if event == "PLAYER_LOGIN" and WoWMobileNativeTouch ~= false then
         -- A missed skill tap landing on the ground must not clear the current target.
         SetCVar("deselectOnClick", "0")
         local reload = false
         for i = 1, GetNumAddOns() do
-            local name = GetAddOnInfo(i)
-            if name and name:match("^ConsolePort") then
-                -- Enabled controls the next load; disabled addons can still be running.
-                if IsAddOnLoaded(name) then reload = true end
+            local name, _, _, enabled = GetAddOnInfo(i)
+            if name and name:match("^ConsolePort") and (enabled == true or enabled == 1) then
                 DisableAddOn(name)
+                reload = true
             end
         end
         if reload then ReloadUI(); return end

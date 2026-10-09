@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import com.winlator.container.Shortcut;
 import com.winlator.widget.XServerView;
 
@@ -17,6 +18,9 @@ public final class OldDreamIntegration {
     }
     public static void showStartup(Activity activity, Shortcut shortcut, FrameLayout root, XServerView surface) {
         if (isOldDream(shortcut)) root.addView(new OldDreamStartupView(activity, surface));
+    }
+    public static void showKeyboardButton(AppCompatActivity activity, Shortcut shortcut, FrameLayout root) {
+        if (isOldDream(shortcut)) root.addView(new OldDreamKeyboardButton(activity));
     }
     public static String resolution(Context context) {
         DisplayMetrics metrics = new DisplayMetrics();

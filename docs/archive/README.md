@@ -2,7 +2,7 @@
 
 本目录保留原始设计和阶段验收，文中数值、下载地址、APK哈希、待办状态只适用于当时版本。当前功能统一看[安装与使用手册](../OldDreamWOW_New_Device_Setup_Checklist.md)和[开发维护手册](../OldDreamWOW_Development_Guide.md)，总入口见[文档首页](../README.md)。
 
-整理日期2026-10-08；没有重新执行下列历史测试。原文保留，仅增加历史提示和修复资源链接。
+整理日期2026-10-08；旧测试没有重新执行；10月8日新增的验收单独列出。原文保留，仅增加历史提示和修复资源链接。
 
 ## 阶段文档
 
@@ -19,6 +19,7 @@
 | 10-05 / v10 | [加载页与技能误触目标保护](history/OldDreamWOW_Loading_and_Target_Guard_20261005.md) |
 | 10-05 / v11 | [真实计时、历史耗时与120秒入口](history/OldDreamWOW_Startup_History_20261005.md) |
 | 10-07 / v12 | [六分片下载、片内续传、SHA-256及完整安装验收](history/OldDreamWOW_Split_Client_Download_20261007.md) |
+| 10-08 / v13 | [顶部键盘入口、旧ConsolePort隔离与原生模式验收](history/OldDreamWOW_Keyboard_and_Native_Mode_20261008.md) |
 
 ## 如何使用证据
 
@@ -29,7 +30,7 @@
 
 ## 配套资源
 
-- [实机截图目录](../assets/screenshots/)：49张原始截图，各阶段文档直接链接对应图片。
+- [实机截图目录](../assets/screenshots/)：51张阶段截图，各阶段文档直接链接对应图片。
 - [图标资源目录](../assets/brand/)与[触控配置目录](../assets/touch/)：保留图标原图、实际配置及原始布局备份。
 - [旧APK目录](apk/)：当前保留一份v7本机快照；较早快照已不在此目录，原文的旧版本信息仅作历史记录。APK忽略Git，不随源码拉取。当前固定APK位于[docs根目录](../OldDreamWOW.apk)。
 

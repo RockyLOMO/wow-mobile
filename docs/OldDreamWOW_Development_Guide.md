@@ -1,8 +1,8 @@
 # 旧梦WOW：开发维护手册
 
-整理日期：2026-10-08。现行功能截至2026-10-07六分片下载版本（阶段编号v12）。`v7`～`v12`是开发阶段标记；Android包版本仍为`0.1.2 / versionCode 3`，Lua触控插件为v7。
+整理日期：2026-10-08。现行功能截至2026-10-08键盘入口与原生模式修复（阶段编号v13）。`v7`～`v13`是开发阶段标记；Android包版本仍为`0.1.2 / versionCode 3`，Lua触控插件为v8。
 
-玩家安装与设置见[安装使用手册](OldDreamWOW_New_Device_Setup_Checklist.md)，历史原文与验证截图见[历史索引](archive/README.md)。本次仅整理文档；下列构建、测试和实机结果为此前记录，不表示2026-10-08重新执行了这些验证。
+玩家安装与设置见[安装使用手册](OldDreamWOW_New_Device_Setup_Checklist.md)，历史原文与验证截图见[历史索引](archive/README.md)。下列六分片与旧加载页测试保留原验收日期；10月8日新增键盘入口、ConsolePort隔离测试和S10原生模式验收，见[v13记录](archive/history/OldDreamWOW_Keyboard_and_Native_Mode_20261008.md)。
 
 ## 1. 模块与上游升级边界
 
@@ -21,6 +21,8 @@
 | [StartupProgress](../app/src/main/java/com/winlator/wowmobile/StartupProgress.java) / [StartupFrameReadiness](../app/src/main/java/com/winlator/wowmobile/StartupFrameReadiness.java) | 历史耗时曲线、计时格式和场景判定 |
 | [WowNativeTouchController](../app/src/main/java/com/winlator/wow/WowNativeTouchController.java) | 原生手势状态机与输入释放 |
 | [TouchCoordinateMapper](../app/src/main/java/com/winlator/renderer/TouchCoordinateMapper.java) | 实际viewport、zoom、sceneOffset与触摸坐标逆映射 |
+| [ConsolePortIsolation](../app/src/main/java/com/winlator/wowmobile/ConsolePortIsolation.java) | 启动前可逆隔离/恢复旧手柄插件，拒绝目录冲突与覆盖 |
+| [OldDreamKeyboardButton](../app/src/main/java/com/winlator/wowmobile/OldDreamKeyboardButton.java) | 顶部键盘图标，复用系统键盘入口，保留Wine焦点 |
 | [WoWMobileTouchUI.lua](../app/src/main/assets/wowmobile/WoWMobileTouchUI.lua) | 原生模式的动作栏、字体、按键及目标保留 |
 
 上游升级重点：`TouchpadView`的鼠标注入、`InputControlsView`按pointer ID分流、`GLRenderer`/坐标映射、`XServerDisplayActivity`的Native启用/暂停释放/加载页入口、`RootFSInstaller`完成回调。不要恢复按整个屏幕比例直接换算触点的旧逻辑；OpenGL底部原点与Android顶部原点需要明确转换。
@@ -72,7 +74,7 @@ flowchart TD
 
 | 项目 | 当前规则 |
 | --- | --- |
-| 默认模式 | Native；Legacy可选。Native禁用已有ConsolePort并按需ReloadUI |
+| 默认模式 | Native；Legacy可选。Native启动前把ConsolePort前缀目录隔离到`.olddream-consoleport`；Legacy恢复目录并启用ConsolePort/ConsolePortBar核心插件 |
 | 分辨率 | 高720，物理横屏比例计算偶数宽；16:9为1280×720，S10的19:9为1520×720，20:9为1600×720；游戏与容器同步 |
 | 方向/按键 | W/S前后，A/D横移，Space跳跃，Tab最近敌人；按当前绑定集保存 |
 | 轻点 / 快速拖动 | 绝对坐标左键 / 右键相对位移转镜头 |
@@ -87,7 +89,7 @@ flowchart TD
 
 S10实测目标中心(1258,374)、跳跃(1272,482)，距右栏约2px；这些是S10验证值，不是所有比例的保证。APK不强制打开两条右栏，也不复制技能槽或BigFoot账号选项，见安装使用手册。
 
-插件升级按已知原始旧Lua精确匹配（v2/v3/v4/v5/v5-early/v6）；玩家修改过的Lua/TOC保留。不要用直接覆盖所有AddOns文件的方式更新。
+插件升级按已知原始旧Lua精确匹配（v2/v3/v4/v5/v5-early/v6/v7/v8-preview）；已知v1/v4 TOC也可迁移，保证模式脚本加载；玩家修改过的Lua/TOC保留。不要用直接覆盖所有AddOns文件的方式更新。
 
 ## 4. 构建、发布与定向验证
 
@@ -126,3 +128,9 @@ S10验证使用`D:\home\.shell\android-sdk\platform-tools\adb.exe`、主用户0�
 2026-10-07下载验收到登录页，没有登录账号或进入角色；恢复原客户端后再次自动进入登录页并完成收尾。具体命令结果、截图和各阶段差异见历史索引。
 
 历史方案中的800×600、960×432、1280×1024、固定宽1280、UI全局1.12、数字技能透明Overlay、ConsolePort默认、英文JUMP/TGT、v10的30秒80%/60秒查看入口、单ZIP下载均已被替代，不作为当前操作说明。
+
+## 6. 客户端源目录与v13验证
+
+PC客户端源：`D:\Program Files\Game\World of Warcraft 3.3.5a CN`。发布分片位于`E:\rxdev\webhost\wow`，Android继续下载六片。10月8日只读核对源AddOns目录及分片ZIP中央目录（2,727条目），两者均不含ConsolePort；S10上的旧ConsolePort来自早期Legacy初始化，当前修复无需更换分片。
+
+`ConsolePortIsolationTest`通过真实文件迁移验证Native隔离、Legacy恢复、重复执行、玩家修改内容保留和同名冲突保护。隔离目标有同名目录时拒绝继续，不覆盖；失败尝试回滚。切换Legacy在游戏内恢复核心插件启用，Legacy整套游戏实机体验本轮未验收。S10原生角色验证确认CP/Bar未加载、Native=true、目标保留=0、A/D横移；键盘打开、关闭及登录输入通过。

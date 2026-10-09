@@ -106,6 +106,8 @@ public class Provisioner {
         try {
             boolean nativeTouch = PreferenceManager.getDefaultSharedPreferences(context)
                 .getBoolean(WowContainerHelper.PREF_NATIVE_TOUCH, true);
+            // Keep controller addons out of WoW's loader before any addon can alter the UI.
+            if (!ConsolePortIsolation.apply(gameFolder.root, nativeTouch)) return false;
             // Native touch uses Blizzard's action buttons; do not install a gamepad wizard.
             // Keep legacy mode available when the player explicitly selects it.
             if (!nativeTouch) {
@@ -169,8 +171,7 @@ public class Provisioner {
             if (contents == null) return false;
             if (target.isFile()) {
                 boolean known = "lua".equals(extension) ? isUnmodifiedLegacyTouchUi(target) :
-                    FileUtils.readString(target).replace("\r\n", "\n").trim().equals(
-                        FileUtils.readString(context, "wowmobile/legacy/WoWMobileTouchUI-v4.toc").replace("\r\n", "\n").trim());
+                    isUnmodifiedLegacyTouchToc(target);
                 if (!known) continue;
             }
             if (!FileUtils.write(target, contents)) return false;
@@ -188,8 +189,17 @@ public class Provisioner {
             "end)";
         String current = FileUtils.readString(file).replace("\r\n", "\n").trim();
         if (legacy.equals(current)) return true;
-        for (String version : new String[]{"v2", "v3", "v4", "v5", "v5-early", "v6"}) {
+        for (String version : new String[]{"v2", "v3", "v4", "v5", "v5-early", "v6", "v7", "v8-preview"}) {
             String bundled = FileUtils.readString(context, "wowmobile/legacy/WoWMobileTouchUI-"+version+".lua");
+            if (bundled.replace("\r\n", "\n").trim().equals(current)) return true;
+        }
+        return false;
+    }
+
+    private boolean isUnmodifiedLegacyTouchToc(File file) {
+        String current = FileUtils.readString(file).replace("\r\n", "\n").trim();
+        for (String version : new String[]{"v1", "v4"}) {
+            String bundled = FileUtils.readString(context, "wowmobile/legacy/WoWMobileTouchUI-"+version+".toc");
             if (bundled.replace("\r\n", "\n").trim().equals(current)) return true;
         }
         return false;

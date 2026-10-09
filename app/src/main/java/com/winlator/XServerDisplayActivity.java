@@ -621,6 +621,7 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
 
         if (MainActivity.DEBUG_MODE) rootView.addView(AppUtils.createDebugMsgTextView(this));
         AppUtils.observeSoftKeyboardVisibility(drawerLayout, renderer::setScreenOffsetYRelativeToCursor);
+        OldDreamIntegration.showKeyboardButton(this, shortcut, rootView);
         OldDreamIntegration.showStartup(this, shortcut, rootView, xServerView);
     }
 
